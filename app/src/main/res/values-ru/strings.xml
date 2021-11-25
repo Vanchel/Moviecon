@@ -1,0 +1,70 @@
+<resources>
+    <string name="app_name">Moviecon</string>
+    <string name="nav_drawer_header_title">Добро пожаловать.</string>
+    <string name="nav_drawer_header_subtitle">Миллионы фильмов, сериалов и людей. Исследуйте сейчас.</string>
+    <string name="nav_drawer_header_description">Логотип TMDB</string>
+    <string name="movies">Фильмы</string>
+    <string name="tvs">Сериалы</string>
+    <string name="people">Люди</string>
+    <string name="cinematic_backdrop_description">Фоновое изображение</string>
+    <string name="play_video">Трейлер</string>
+    <string name="annotation_header">Аннотация</string>
+    <string name="common_header">Общее</string>
+    <string name="famous_actors">Известные актеры</string>
+    <string name="full_cast">Полный актерский состав</string>
+    <string name="posters_gallery">Галерея постеров</string>
+    <string name="others_header">Прочее</string>
+    <string name="to_instagram">В инстаграм</string>
+    <string name="birthday_hint">Дата рождения</string>
+    <string name="bio_header">Биография</string>
+    <string name="place_of_birth">Место рождения</string>
+    <string name="birth_place_none">-Неизвестно-</string>
+    <string name="sex">Пол</string>
+    <string name="famous_motion_pictures">Известные картины</string>
+    <string name="filmography">Фильмография</string>
+    <string name="loading_title">Загрузка…</string>
+    <string name="error_hint">При загрузке данных произошла ошибка.</string>
+    <string name="try_again">Попробовать снова</string>
+    <string name="date_unknown">-Дата неизвестна-</string>
+    <string name="no_overview">-Нет описания-</string>
+    <string name="user_vote_rating">Пользовательский рейтинг</string>
+    <string name="actors_photo_description">Фото актера</string>
+    <string name="cast">Актерский состав</string>
+    <string name="posters">Постеры</string>
+    <string name="poster_description">Постер к фильму</string>
+    <string name="save_to_gallery">Сохранить в галерею</string>
+    <string name="saved_to_gallery">Изображение сохранено в галерею</string>
+    <string name="write_external_storage_permission_rationale">Для записи файла требуется разрешение</string>
+    <string name="provide_permission">Предоставить</string>
+    <string name="credits_no_date"> - </string>
+    <string name="credits_no_character">-Персонаж не указан-</string>
+    <string name="movies_popular">Популярные</string>
+    <string name="movies_now_playing">Смотрят сейчас</string>
+    <string name="movies_upcoming">Ожидаемые</string>
+    <string name="movies_top_rated">Лучшие</string>
+    <string name="tvs_popular">Популярные</string>
+    <string name="tvs_airing_today">В эфире сегодня</string>
+    <string name="tvs_on_the_air">По телевидению</string>
+    <string name="tvs_top_rated">Лучшие</string>
+    <string name="trending_movies">В тренде: фильмы</string>
+    <string name="trending_tvs">В тренде: сериалы</string>
+    <string name="trending_people">В тренде: люди</string>
+    <string name="trending_hint">Трендовые подборки обновляются ежедневно.</string>
+    <string name="ratings_percentage">%1$d%%</string>
+    <string name="ratings_detailed">Рейтинг - %1$d%%</string>
+    <string name="hours_minutes">%1$dч %2$dм</string>
+    <string name="minutes">%1$dм</string>
+
+    <string-array name="sex">
+        <item>-Не известно-</item>
+        <item>Женщина</item>
+        <item>Мужчина</item>
+    </string-array>
+
+    <plurals name="age">
+        <item quantity="one">%1$d год</item>
+        <item quantity="few">%1$d года</item>
+        <item quantity="many">%1$d лет</item>
+        <item quantity="other">%1$d лет</item>
+    </plurals>
+</resources>

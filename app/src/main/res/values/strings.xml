@@ -1,0 +1,68 @@
+<resources>
+    <string name="app_name">Moviecon</string>
+    <string name="nav_drawer_header_title">Welcome.</string>
+    <string name="nav_drawer_header_subtitle">Millions of movies, TV shows and people to discover. Explore now.</string>
+    <string name="nav_drawer_header_description">TMDB logo</string>
+    <string name="movies">Movies</string>
+    <string name="tvs">TVs</string>
+    <string name="people">People</string>
+    <string name="cinematic_backdrop_description">Backdrop</string>
+    <string name="play_video">Trailer</string>
+    <string name="annotation_header">Annotation</string>
+    <string name="common_header">Common</string>
+    <string name="famous_actors">Top billed cast</string>
+    <string name="full_cast">Full cast</string>
+    <string name="posters_gallery">Posters</string>
+    <string name="others_header">Others</string>
+    <string name="to_instagram">Instagram</string>
+    <string name="birthday_hint">Birthday</string>
+    <string name="bio_header">Biography</string>
+    <string name="place_of_birth">Place of Birth</string>
+    <string name="birth_place_none">-Unknown-</string>
+    <string name="sex">Gender</string>
+    <string name="famous_motion_pictures">Known for</string>
+    <string name="filmography">Acting</string>
+    <string name="loading_title">Loading…</string>
+    <string name="error_hint">An error occurred while loading data.</string>
+    <string name="try_again">Try again</string>
+    <string name="date_unknown">-Date unknown-</string>
+    <string name="no_overview">-No description-</string>
+    <string name="user_vote_rating">User score</string>
+    <string name="actors_photo_description">Photo</string>
+    <string name="cast">Cast</string>
+    <string name="posters">Posters</string>
+    <string name="poster_description">Movie poster</string>
+    <string name="save_to_gallery">Save to gallery</string>
+    <string name="saved_to_gallery">Picture saved to gallery</string>
+    <string name="write_external_storage_permission_rationale">Permission is required to write the file</string>
+    <string name="provide_permission">Allow</string>
+    <string name="credits_no_date"> - </string>
+    <string name="credits_no_character">-Character not specified-</string>
+    <string name="movies_popular">Popular</string>
+    <string name="movies_now_playing">Now playing</string>
+    <string name="movies_upcoming">Upcoming</string>
+    <string name="movies_top_rated">Top rated</string>
+    <string name="tvs_popular">Popular</string>
+    <string name="tvs_airing_today">Airing today</string>
+    <string name="tvs_on_the_air">On TV</string>
+    <string name="tvs_top_rated">Top rated</string>
+    <string name="trending_movies">Trending: Movies</string>
+    <string name="trending_tvs">Trending: TVs</string>
+    <string name="trending_people">Trending: People</string>
+    <string name="trending_hint">Trend collections are updated daily.</string>
+    <string name="ratings_percentage">%1$d%%</string>
+    <string name="ratings_detailed">Score - %1$d%%</string>
+    <string name="hours_minutes">%1$dh %2$dm</string>
+    <string name="minutes">%1$dm</string>
+
+    <string-array name="sex">
+        <item>-Unknown-</item>
+        <item>Female</item>
+        <item>Male</item>
+    </string-array>
+
+    <plurals name="age">
+        <item quantity="one">%1$d year</item>
+        <item quantity="other">%1$d years</item>
+    </plurals>
+</resources>

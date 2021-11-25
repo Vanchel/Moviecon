@@ -1,0 +1,17 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Moviecon" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/light_blue_800_light</item>
+        <item name="colorPrimaryVariant">@color/light_blue_800_dark</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/cyan_a200_light</item>
+        <item name="colorSecondaryVariant">@color/cyan_a200_light</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Toolbar" parent="">
+        <item name="colorPrimary">@color/light_blue_800_light</item>
+        <item name="colorPrimaryVariant">@color/light_blue_800_dark</item>
+        <item name="colorOnPrimary">@color/black</item>
+    </style>
+</resources>

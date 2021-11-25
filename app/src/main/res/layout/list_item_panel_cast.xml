@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_small"
+            android:foreground="?selectableItemBackground">
+
+        <LinearLayout
+                android:layout_width="@dimen/panel_person_item_width"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <ImageView
+                    android:id="@+id/image_photo"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/panel_person_item_image_height"
+                    android:src="@drawable/ic_round_person_24"
+                    android:background="?colorPrimary"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/actors_photo_description" />
+
+            <TextView
+                    android:id="@+id/text_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/margin_x_small"
+                    android:textAppearance="?textAppearanceSubtitle1"
+                    android:lines="2"
+                    android:ellipsize="end"
+                    tools:text="Gérard Depardieu" />
+
+            <TextView
+                    android:id="@+id/text_character"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/margin_x_small"
+                    android:layout_marginBottom="@dimen/margin_small"
+                    android:lines="2"
+                    android:ellipsize="end"
+                    tools:text="Dauriat" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+</layout>

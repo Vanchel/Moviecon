@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/nav_graph"
+        app:startDestination="@id/mainFragment">
+
+    <fragment
+            android:id="@+id/mainFragment"
+            android:name="com.vanchel.moviecon.presentation.screens.MainFragment"
+            android:label="@string/app_name"
+            tools:layout="@layout/fragment_main">
+        <action
+                android:id="@+id/mainToPeople"
+                app:destination="@id/peopleFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/mainToTvs"
+                app:destination="@id/tvsFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/mainToMovies"
+                app:destination="@id/moviesFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/mainToMovie"
+                app:destination="@id/movieFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/mainToTv"
+                app:destination="@id/tvFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/mainToPerson"
+                app:destination="@id/personFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+            android:id="@+id/moviesFragment"
+            android:name="com.vanchel.moviecon.presentation.screens.MoviesFragment"
+            android:label="fragment_movies"
+            tools:layout="@layout/fragment_view_pager">
+        <action
+                android:id="@+id/moviesToMovie"
+                app:destination="@id/movieFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+            android:id="@+id/tvsFragment"
+            android:name="com.vanchel.moviecon.presentation.screens.TvsFragment"
+            android:label="fragment_tvs"
+            tools:layout="@layout/fragment_view_pager">
+        <action
+                android:id="@+id/tvsToTv"
+                app:destination="@id/tvFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+            android:id="@+id/peopleFragment"
+            android:name="com.vanchel.moviecon.presentation.screens.PeopleFragment"
+            android:label="fragment_people"
+            tools:layout="@layout/fragment_view_pager">
+        <action
+                android:id="@+id/peopleToPerson"
+                app:destination="@id/personFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+            android:id="@+id/personFragment"
+            android:name="com.vanchel.moviecon.presentation.screens.PersonFragment"
+            android:label="fragment_person"
+            tools:layout="@layout/fragment_person">
+        <action
+                android:id="@+id/personToFilmography"
+                app:destination="@id/filmographyFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/personToTv"
+                app:destination="@id/tvFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/personToMovie"
+                app:destination="@id/movieFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <argument
+                android:name="person_id"
+                app:argType="integer" />
+        <argument
+                android:name="person_name"
+                app:argType="string" />
+    </fragment>
+    <fragment
+            android:id="@+id/castFragment"
+            android:name="com.vanchel.moviecon.presentation.screens.CastFragment"
+            android:label="fragment_cast"
+            tools:layout="@layout/fragment_cast">
+        <argument
+                android:name="cinematic_id"
+                app:argType="integer" />
+        <argument
+                android:name="type"
+                app:argType="com.vanchel.moviecon.domain.entities.CinematicType" />
+        <action
+                android:id="@+id/castToPerson"
+                app:destination="@id/personFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <argument
+                android:name="cinematic_name"
+                app:argType="string" />
+    </fragment>
+    <fragment
+            android:id="@+id/playerFragment"
+            android:name="com.vanchel.moviecon.presentation.screens.PlayerFragment"
+            android:label="fragment_player"
+            tools:layout="@layout/fragment_player">
+        <argument
+                android:name="video_id"
+                app:argType="string" />
+    </fragment>
+    <fragment
+            android:id="@+id/postersFragment"
+            android:name="com.vanchel.moviecon.presentation.screens.PostersFragment"
+            android:label="fragment_posters"
+            tools:layout="@layout/fragment_posters">
+        <action
+                android:id="@+id/postersToPoster"
+                app:destination="@id/posterFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <argument
+                android:name="cinematic_id"
+                app:argType="integer" />
+        <argument
+                android:name="type"
+                app:argType="com.vanchel.moviecon.domain.entities.CinematicType" />
+        <argument
+                android:name="cinematic_name"
+                app:argType="string" />
+    </fragment>
+    <fragment
+            android:id="@+id/posterFragment"
+            android:name="com.vanchel.moviecon.presentation.screens.PosterFragment"
+            android:label="fragment_poster"
+            tools:layout="@layout/fragment_poster">
+        <argument
+                android:name="imagePath"
+                app:argType="string" />
+    </fragment>
+    <fragment
+            android:id="@+id/filmographyFragment"
+            android:name="com.vanchel.moviecon.presentation.screens.FilmographyFragment"
+            android:label="fragment_filmography"
+            tools:layout="@layout/fragment_filmography">
+        <action
+                android:id="@+id/filmographyToTv"
+                app:destination="@id/tvFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/filmographyToMovie"
+                app:destination="@id/movieFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <argument
+                android:name="person_id"
+                app:argType="integer" />
+        <argument
+                android:name="person_name"
+                app:argType="string" />
+    </fragment>
+    <fragment
+            android:id="@+id/movieFragment"
+            android:name="com.vanchel.moviecon.presentation.screens.MovieFragment"
+            android:label="fragment_movie"
+            tools:layout="@layout/fragment_movie">
+        <action
+                android:id="@+id/movieToPosters"
+                app:destination="@id/postersFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/movieToCast"
+                app:destination="@id/castFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/movieToPlayer"
+                app:destination="@id/playerFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/movieToPerson"
+                app:destination="@id/personFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <argument
+                android:name="movie_id"
+                app:argType="integer" />
+        <argument
+                android:name="movie_name"
+                app:argType="string" />
+    </fragment>
+    <fragment
+            android:id="@+id/tvFragment"
+            android:name="com.vanchel.moviecon.presentation.screens.TvFragment"
+            android:label="fragment_tv"
+            tools:layout="@layout/fragment_tv">
+        <action
+                android:id="@+id/tvToPosters"
+                app:destination="@id/postersFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/tvToCast"
+                app:destination="@id/castFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/tvToPlayer"
+                app:destination="@id/playerFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/tvToPerson"
+                app:destination="@id/personFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/static_anim"
+                app:popExitAnim="@anim/slide_out_right" />
+        <argument
+                android:name="tv_id"
+                app:argType="integer" />
+        <argument
+                android:name="tv_name"
+                app:argType="string" />
+    </fragment>
+</navigation>

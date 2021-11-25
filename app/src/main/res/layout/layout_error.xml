@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_regular"
+                android:layout_marginVertical="@dimen/margin_small"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:text="@string/error_hint" />
+
+        <Button
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:id="@+id/button_retry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_regular"
+                android:layout_marginVertical="@dimen/margin_small"
+                android:layout_gravity="center_horizontal"
+                android:textAllCaps="false"
+                android:text="@string/try_again" />
+
+    </LinearLayout>
+</layout>
