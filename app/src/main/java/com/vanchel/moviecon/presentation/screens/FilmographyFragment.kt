@@ -77,7 +77,7 @@ class FilmographyFragment : Fragment() {
     }
 
     private fun setOnClickListeners() {
-        binding.sectionError.buttonRetry.setOnClickListener { v -> filmographyViewModel.reload() }
+        binding.sectionError.buttonRetry.setOnClickListener { filmographyViewModel.reload() }
     }
 
     private fun setUpRecyclerView() {

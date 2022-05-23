@@ -77,7 +77,7 @@ class CastFragment : Fragment() {
     }
 
     private fun setOnClickListeners() {
-        binding.sectionError.buttonRetry.setOnClickListener { v -> castViewModel.reload() }
+        binding.sectionError.buttonRetry.setOnClickListener { castViewModel.reload() }
     }
 
     private fun setUpRecyclerView() {

@@ -42,7 +42,7 @@ class MoviesViewModel @AssistedInject constructor(
          */
         fun provideFactory(assistedFactory: Factory, type: MovieType): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
-                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     @Suppress("UNCHECKED_CAST")
                     if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
                         return assistedFactory.create(type) as T

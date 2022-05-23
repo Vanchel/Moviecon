@@ -161,7 +161,7 @@ class TvViewModel @AssistedInject constructor(
          */
         fun provideFactory(assistedFactory: Factory, tvId: Int): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
-                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     @Suppress("UNCHECKED_CAST")
                     if (modelClass.isAssignableFrom(TvViewModel::class.java)) {
                         return assistedFactory.create(tvId) as T

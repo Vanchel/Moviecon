@@ -77,7 +77,7 @@ class PostersFragment : Fragment() {
     }
 
     private fun setOnClickListeners() {
-        binding.sectionError.buttonRetry.setOnClickListener { v -> postersViewModel.reload() }
+        binding.sectionError.buttonRetry.setOnClickListener { postersViewModel.reload() }
     }
 
     private fun setUpRecyclerView() {

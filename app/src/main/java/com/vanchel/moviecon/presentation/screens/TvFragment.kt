@@ -152,7 +152,7 @@ class TvFragment : Fragment() {
             textVoteAverage.text = getString(
                 R.string.ratings_percentage, (tvDetails.voteAverage * 10).toInt()
             )
-            textAnnotation.text = tvDetails.overview ?: getString(R.string.no_overview)
+            textAnnotation.text = tvDetails.overview
 
             tvDetails.getTopCast()?.let {
                 (recyclerViewCast.adapter as CastPanelAdapter?)?.submitList(it)
