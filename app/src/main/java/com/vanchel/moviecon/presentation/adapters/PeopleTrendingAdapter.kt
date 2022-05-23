@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vanchel.moviecon.R
+import com.vanchel.moviecon.data.network.IMAGES_URL
 import com.vanchel.moviecon.databinding.ListItemPersonTrendingBinding
 import com.vanchel.moviecon.domain.entities.Person
-import com.vanchel.moviecon.util.BASE_URL_IMAGE
 import com.vanchel.moviecon.util.SIZE_PROFILE_MEDIUM
 
 /**
@@ -48,7 +48,7 @@ class PeopleTrendingAdapter(private val itemCallback: ItemCallback) :
         fun bind(item: Person) {
             binding.apply {
                 item.profilePath?.let {
-                    val url = "$BASE_URL_IMAGE$SIZE_PROFILE_MEDIUM$it"
+                    val url = "$IMAGES_URL$SIZE_PROFILE_MEDIUM$it"
                     Glide.with(root.context).load(url)
                         .placeholder(R.drawable.ic_round_person_24).into(imagePhoto)
                 } ?: imagePhoto.setImageResource(R.drawable.ic_round_person_24)

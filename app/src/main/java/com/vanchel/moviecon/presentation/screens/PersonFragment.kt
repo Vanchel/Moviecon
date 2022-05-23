@@ -13,6 +13,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.vanchel.moviecon.R
+import com.vanchel.moviecon.data.network.IMAGES_URL
 import com.vanchel.moviecon.databinding.FragmentPersonBinding
 import com.vanchel.moviecon.domain.entities.Credit
 import com.vanchel.moviecon.domain.entities.PersonDetails
@@ -20,8 +21,8 @@ import com.vanchel.moviecon.presentation.adapters.CreditsPanelAdapter
 import com.vanchel.moviecon.presentation.utils.Resource
 import com.vanchel.moviecon.presentation.utils.navigate
 import com.vanchel.moviecon.presentation.viewmodels.PersonViewModel
-import com.vanchel.moviecon.util.BASE_URL_IMAGE
 import com.vanchel.moviecon.util.SIZE_PROFILE_LARGE
+import com.vanchel.moviecon.util.extensions.title
 import dagger.hilt.android.AndroidEntryPoint
 import org.joda.time.DateTime
 import org.joda.time.Period
@@ -143,7 +144,7 @@ class PersonFragment : Fragment() {
     private fun bindPersonDetailsData(personDetails: PersonDetails) {
         binding.apply {
             personDetails.profilePath?.let {
-                val url = "$BASE_URL_IMAGE$SIZE_PROFILE_LARGE$it"
+                val url = "$IMAGES_URL$SIZE_PROFILE_LARGE$it"
                 Glide.with(requireView())
                     .load(url).placeholder(R.drawable.ic_round_person_24).into(avatar)
             }
@@ -155,7 +156,7 @@ class PersonFragment : Fragment() {
             textBirthday.text = formatBirthDay(personDetails.birthday, personDetails.deathDay)
             textPlaceOfBirth.text = personDetails.placeOfBirth
                 ?: getString(R.string.birth_place_none)
-            textSex.text = resources.getStringArray(R.array.sex)[personDetails.gender]
+            textSex.setText(personDetails.gender.title)
             textBio.text = personDetails.biography
             (recyclerViewCredits.adapter as CreditsPanelAdapter?)
                 ?.submitList(personDetails.getTopCredits())

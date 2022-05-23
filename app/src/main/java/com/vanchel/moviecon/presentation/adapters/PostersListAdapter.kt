@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vanchel.moviecon.R
+import com.vanchel.moviecon.data.network.IMAGES_URL
 import com.vanchel.moviecon.databinding.ListItemPosterBinding
 import com.vanchel.moviecon.domain.entities.Image
-import com.vanchel.moviecon.util.BASE_URL_IMAGE
 import com.vanchel.moviecon.util.SIZE_POSTER_LARGE
 
 /**
@@ -47,7 +47,7 @@ class PostersListAdapter(private val itemCallback: ItemCallback) :
          */
         fun bind(item: Image) {
             binding.apply {
-                val url = "$BASE_URL_IMAGE$SIZE_POSTER_LARGE${item.filePath}"
+                val url = "$IMAGES_URL$SIZE_POSTER_LARGE${item.filePath}"
                 Glide.with(root).load(url).placeholder(R.drawable.img_backdrop).into(imagePoster)
                 cardView.setOnClickListener { callback.onItemSelected(item) }
             }

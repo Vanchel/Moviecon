@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.vanchel.moviecon.R
+import com.vanchel.moviecon.data.network.IMAGES_URL
 import com.vanchel.moviecon.databinding.ListItemCinematicTrendingBinding
 import com.vanchel.moviecon.domain.entities.Tv
-import com.vanchel.moviecon.util.BASE_URL_IMAGE
 import com.vanchel.moviecon.util.SIZE_BACKDROP_MEDIUM
 
 /**
@@ -48,7 +48,7 @@ class TvsTrendingAdapter(private val itemCallback: ItemCallback) :
         fun bind(item: Tv) {
             binding.apply {
                 item.backdropPath?.let {
-                    val url = "$BASE_URL_IMAGE$SIZE_BACKDROP_MEDIUM$it"
+                    val url = "$IMAGES_URL$SIZE_BACKDROP_MEDIUM$it"
                     Glide.with(root.context).load(url)
                         .placeholder(R.drawable.img_backdrop).into(imageBackdrop)
                 } ?: imageBackdrop.setImageResource(R.drawable.img_backdrop)

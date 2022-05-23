@@ -30,9 +30,9 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.Snackbar
 import com.vanchel.moviecon.R
+import com.vanchel.moviecon.data.network.IMAGES_URL
 import com.vanchel.moviecon.databinding.FragmentPosterBinding
 import com.vanchel.moviecon.presentation.viewmodels.PosterViewModel
-import com.vanchel.moviecon.util.BASE_URL_IMAGE
 import com.vanchel.moviecon.util.SIZE_ORIGINAL
 import com.vanchel.moviecon.util.generatePictureFileName
 import dagger.hilt.android.AndroidEntryPoint
@@ -88,7 +88,7 @@ class PosterFragment : Fragment() {
         setViewModelObservers()
 
         Glide.with(view)
-            .load("$BASE_URL_IMAGE$SIZE_ORIGINAL${args.imagePath}")
+            .load("$IMAGES_URL$SIZE_ORIGINAL${args.imagePath}")
             .listener(imageLoadListener)
             .into(binding.imageView)
     }

@@ -10,6 +10,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.vanchel.moviecon.R
+import com.vanchel.moviecon.data.network.IMAGES_URL
 import com.vanchel.moviecon.databinding.FragmentTvBinding
 import com.vanchel.moviecon.domain.entities.Cast
 import com.vanchel.moviecon.domain.entities.CinematicType
@@ -18,7 +19,6 @@ import com.vanchel.moviecon.presentation.adapters.CastPanelAdapter
 import com.vanchel.moviecon.presentation.utils.Resource
 import com.vanchel.moviecon.presentation.utils.navigate
 import com.vanchel.moviecon.presentation.viewmodels.TvViewModel
-import com.vanchel.moviecon.util.BASE_URL_IMAGE
 import com.vanchel.moviecon.util.SIZE_BACKDROP_LARGE
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -136,7 +136,7 @@ class TvFragment : Fragment() {
     private fun bindTvDetailsData(tvDetails: TvDetails) {
         binding.apply {
             tvDetails.backdropPath?.let {
-                val url = "$BASE_URL_IMAGE$SIZE_BACKDROP_LARGE$it"
+                val url = "$IMAGES_URL$SIZE_BACKDROP_LARGE$it"
                 Glide.with(requireView())
                     .load(url).placeholder(R.drawable.img_backdrop).into(backdrop)
             }
