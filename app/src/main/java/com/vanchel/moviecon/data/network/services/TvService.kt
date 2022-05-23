@@ -19,7 +19,7 @@ interface TvService {
      * @return Подробная информация о запрашиваемом сериале
      */
     @GET("tv/{tv_id}?append_to_response=videos,credits")
-    fun getDetails(@Path("tv_id") tvId: Int): Single<TvDetailsJsonResult>
+    fun getDetails(@Path("tv_id") tvId: Int): Single<TvDetailsResponse>
 
     /**
      * Запрашивает информацию о съемочной группе сериала.
@@ -28,7 +28,7 @@ interface TvService {
      * @return Информация о съемочной группе сериала
      */
     @GET("tv/{tv_id}/credits")
-    fun getCredits(@Path("tv_id") tvId: Int): Single<CinematicCreditsJsonResult>
+    fun getCredits(@Path("tv_id") tvId: Int): Single<CinematicCreditsResponse>
 
     /**
      * Запрашивает информацию об изображениях, приложенных к сериалу.
@@ -37,7 +37,7 @@ interface TvService {
      * @return Информация об изображениях
      */
     @GET("tv/{tv_id}/images")
-    fun getImages(@Path("tv_id") tvId: Int): Single<ImagesJsonResult>
+    fun getImages(@Path("tv_id") tvId: Int): Single<ImagesResponse>
 
     /**
      * Запрашивает список популярных сериалов.
@@ -46,7 +46,7 @@ interface TvService {
      * @return Данные о популярных сериалах
      */
     @GET("tv/popular")
-    fun getPopular(@Query("page") page: Int = 1): Single<PageJsonResult<TvJsonResult>>
+    fun getPopular(@Query("page") page: Int = 1): Single<PageResponse<TvResponse>>
 
     /**
      * Запрашивает список сериалов, которые сегодня в эфире.
@@ -55,7 +55,7 @@ interface TvService {
      * @return Данные о сериалах, которые сегодня в эфире
      */
     @GET("tv/airing_today")
-    fun getTvAiringToday(@Query("page") page: Int = 1): Single<PageJsonResult<TvJsonResult>>
+    fun getTvAiringToday(@Query("page") page: Int = 1): Single<PageResponse<TvResponse>>
 
     /**
      * Запрашивает список сериалов, идущих по телевидению.
@@ -64,7 +64,7 @@ interface TvService {
      * @return Данные о сериалах, идущих по телевидению
      */
     @GET("tv/on_the_air")
-    fun getTvOnTheAir(@Query("page") page: Int = 1): Single<PageJsonResult<TvJsonResult>>
+    fun getTvOnTheAir(@Query("page") page: Int = 1): Single<PageResponse<TvResponse>>
 
     /**
      * Запрашивает список лучших сериалов.
@@ -73,5 +73,5 @@ interface TvService {
      * @return Данные о лучших сериалах
      */
     @GET("tv/top_rated")
-    fun getTopRated(@Query("page") page: Int = 1): Single<PageJsonResult<TvJsonResult>>
+    fun getTopRated(@Query("page") page: Int = 1): Single<PageResponse<TvResponse>>
 }

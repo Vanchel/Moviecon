@@ -44,7 +44,7 @@ data class MovieDetails(
     val releaseDate: Date?,
     val revenue: Long,
     val runTime: Int?,
-    val status: String,
+    val status: CinematicStatus,
     val tagline: String?,
     val title: String,
     val voteAverage: Double,

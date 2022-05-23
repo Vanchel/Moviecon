@@ -55,11 +55,12 @@
     <string name="hours_minutes">%1$dh %2$dm</string>
     <string name="minutes">%1$dm</string>
 
-    <string-array name="sex">
-        <item>-Unknown-</item>
-        <item>Female</item>
-        <item>Male</item>
-    </string-array>
+    <!--region gender-->
+    <string name="gender_not_specified">Not specified</string>
+    <string name="gender_female">Female</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_non_binary">Non-binary</string>
+    <!--endregion-->
 
     <plurals name="age">
         <item quantity="one">%1$d year</item>

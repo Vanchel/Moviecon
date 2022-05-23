@@ -2,8 +2,7 @@ package com.vanchel.moviecon.data.paging
 
 import androidx.paging.PagingState
 import androidx.paging.rxjava2.RxPagingSource
-import com.vanchel.moviecon.data.EntityConverter
-import com.vanchel.moviecon.data.network.models.TvJsonResult
+import com.vanchel.moviecon.data.network.models.TvResponse
 import com.vanchel.moviecon.data.network.services.TrendingService
 import com.vanchel.moviecon.domain.entities.Tv
 import com.vanchel.moviecon.util.Schedulers
@@ -17,12 +16,10 @@ private const val STARTING_PAGE_INDEX = 1
  * [PagingSource][RxPagingSource] для постраничного получения сериалов в тренде.
  *
  * @property service Источник данных о сериалах в тренде
- * @property resultConverter Конвертер полученных данных
  * @property schedulers Планировщики для выполнения асинхронных задач
  */
 class TrendingTvsPagingSource(
     private val service: TrendingService,
-    private val resultConverter: EntityConverter<Tv, TvJsonResult>,
     private val schedulers: Schedulers
 ) : RxPagingSource<Int, Tv>() {
     override fun loadSingle(params: LoadParams<Int>): Single<LoadResult<Int, Tv>> {
@@ -31,7 +28,7 @@ class TrendingTvsPagingSource(
             .subscribeOn(schedulers.io)
             .map<LoadResult<Int, Tv>> { result ->
                 LoadResult.Page(
-                    data = result.results.map(resultConverter::toDomainModel),
+                    data = result.results?.map(TvResponse::transform) ?: listOf(),
                     prevKey = if (page == STARTING_PAGE_INDEX) null else page - 1,
                     nextKey = if (page == result.totalPages) null else page + 1
                 )

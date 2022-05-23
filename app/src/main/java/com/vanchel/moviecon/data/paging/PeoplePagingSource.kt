@@ -2,8 +2,7 @@ package com.vanchel.moviecon.data.paging
 
 import androidx.paging.PagingState
 import androidx.paging.rxjava2.RxPagingSource
-import com.vanchel.moviecon.data.EntityConverter
-import com.vanchel.moviecon.data.network.models.PersonJsonResult
+import com.vanchel.moviecon.data.network.models.PersonResponse
 import com.vanchel.moviecon.data.network.services.PeopleService
 import com.vanchel.moviecon.domain.entities.Person
 import com.vanchel.moviecon.domain.entities.PersonType
@@ -18,7 +17,6 @@ private const val STARTING_PAGE_INDEX = 1
  * [PagingSource][RxPagingSource] для постраничного получения людей.
  *
  * @property service Источник данных о людях
- * @property resultConverter Конвертер полученных данных
  * @property schedulers Планировщики для выполнения асинхронных задач
  * @constructor Создает [PagingSource][RxPagingSource] для получения информации о людях
  *
@@ -26,7 +24,6 @@ private const val STARTING_PAGE_INDEX = 1
  */
 class PeoplePagingSource(
     private val service: PeopleService,
-    private val resultConverter: EntityConverter<Person, PersonJsonResult>,
     private val schedulers: Schedulers,
     type: PersonType
 ) : RxPagingSource<Int, Person>() {
@@ -38,7 +35,7 @@ class PeoplePagingSource(
             .subscribeOn(schedulers.io)
             .map<LoadResult<Int, Person>> { result ->
                 LoadResult.Page(
-                    data = result.results.map(resultConverter::toDomainModel),
+                    data = result.results?.map(PersonResponse::transform) ?: listOf(),
                     prevKey = if (page == STARTING_PAGE_INDEX) null else page - 1,
                     nextKey = if (page == result.totalPages) null else page + 1
                 )

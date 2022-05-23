@@ -1,5 +1,7 @@
 package com.vanchel.moviecon.data.network.models
 
+import com.squareup.moshi.Json
+
 /**
  * @author Иван Тимашов
  *
@@ -10,7 +12,7 @@ package com.vanchel.moviecon.data.network.models
  * @property crew список записей об участии человека в качестве члена съемочной группы
  */
 data class PersonMovieCreditsJsonResult(
-    val id: Int?,
-    val cast: List<MovieCreditsJsonResult>,
-    val crew: List<MovieCreditsJsonResult>
+    @Json(name = "id") val id: Int? = null,
+    @Json(name = "cast") val cast: List<MovieCreditsResponse>? = null,
+    @Json(name = "crew") val crew: List<MovieCreditsResponse>? = null
 )

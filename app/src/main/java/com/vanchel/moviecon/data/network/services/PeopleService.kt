@@ -19,7 +19,7 @@ interface PeopleService {
      * @return Подробная информация о запрашиваемом человеке
      */
     @GET("person/{person_id}?append_to_response=movie_credits,tv_credits,external_ids")
-    fun getDetails(@Path("person_id") personId: Int): Single<PersonDetailsJsonResult>
+    fun getDetails(@Path("person_id") personId: Int): Single<PersonDetailsResponse>
 
     /**
      * Запрашивает список популярных людей.
@@ -28,5 +28,5 @@ interface PeopleService {
      * @return Данные о популярных людях
      */
     @GET("person/popular")
-    fun getPopular(@Query("page") page: Int = 1): Single<PageJsonResult<PersonJsonResult>>
+    fun getPopular(@Query("page") page: Int = 1): Single<PageResponse<PersonResponse>>
 }

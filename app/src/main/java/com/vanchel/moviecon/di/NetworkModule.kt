@@ -3,9 +3,9 @@ package com.vanchel.moviecon.di
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.vanchel.moviecon.BuildConfig
+import com.vanchel.moviecon.data.network.BASE_URL
 import com.vanchel.moviecon.data.network.interceptors.AuthInterceptor
 import com.vanchel.moviecon.data.network.services.*
-import com.vanchel.moviecon.util.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

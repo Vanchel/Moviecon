@@ -31,7 +31,7 @@ data class PersonDetails(
     val biography: String,
     val birthday: Date?,
     val deathDay: Date?,
-    val gender: Int,
+    val gender: Gender,
     val homepage: String?,
     val name: String,
     val placeOfBirth: String?,

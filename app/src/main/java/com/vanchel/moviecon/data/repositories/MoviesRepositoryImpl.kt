@@ -4,11 +4,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.rxjava2.flowable
-import com.vanchel.moviecon.data.EntityConverter
-import com.vanchel.moviecon.data.network.models.CinematicCreditsJsonResult
-import com.vanchel.moviecon.data.network.models.ImagesJsonResult
-import com.vanchel.moviecon.data.network.models.MovieDetailsJsonResult
-import com.vanchel.moviecon.data.network.models.MovieJsonResult
+import com.vanchel.moviecon.data.network.models.CinematicCreditsResponse
+import com.vanchel.moviecon.data.network.models.ImagesResponse
+import com.vanchel.moviecon.data.network.models.MovieDetailsResponse
 import com.vanchel.moviecon.data.network.services.MoviesService
 import com.vanchel.moviecon.data.paging.MoviesPagingSource
 import com.vanchel.moviecon.domain.entities.*
@@ -25,37 +23,29 @@ import javax.inject.Inject
  * Основная реализация [MoviesRepository].
  *
  * @property moviesService Источник данных о фильмах
- * @property movieConverter Конвертер информации о фильмах
- * @property movieDetailsConverter Конвертер подробной информации о фильмах
- * @property castConverter Конвертер информации об актерах
- * @property imagesConverter Конвертер информации об изображениях
  * @property schedulers Планировщики для выполнения асинхронных задач
  */
 class MoviesRepositoryImpl @Inject constructor(
     private val moviesService: MoviesService,
-    private val movieConverter: EntityConverter<Movie, MovieJsonResult>,
-    private val movieDetailsConverter: EntityConverter<MovieDetails, MovieDetailsJsonResult>,
-    private val castConverter: EntityConverter<List<Cast>, CinematicCreditsJsonResult>,
-    private val imagesConverter: EntityConverter<Images, ImagesJsonResult>,
     private val schedulers: Schedulers
 ) : MoviesRepository {
     override fun getMovieDetails(movieId: Int): Single<MovieDetails> {
-        return moviesService.getDetails(movieId).map(movieDetailsConverter::toDomainModel)
+        return moviesService.getDetails(movieId).map(MovieDetailsResponse::transform)
     }
 
     override fun getMovieCredits(movieId: Int): Single<List<Cast>> {
-        return moviesService.getCredits(movieId).map(castConverter::toDomainModel)
+        return moviesService.getCredits(movieId).map(CinematicCreditsResponse::transform)
     }
 
     override fun getMovieImages(movieId: Int): Single<Images> {
-        return moviesService.getImages(movieId).map(imagesConverter::toDomainModel)
+        return moviesService.getImages(movieId).map(ImagesResponse::transform)
     }
 
     override fun getMoviesStream(type: MovieType): Flowable<PagingData<Movie>> {
         return Pager(
             config = PagingConfig(enablePlaceholders = false, pageSize = PAGE_SIZE),
             pagingSourceFactory = {
-                MoviesPagingSource(moviesService, movieConverter, schedulers, type)
+                MoviesPagingSource(moviesService, schedulers, type)
             }
         ).flowable
     }

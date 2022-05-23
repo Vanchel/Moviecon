@@ -4,10 +4,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.rxjava2.flowable
-import com.vanchel.moviecon.data.EntityConverter
-import com.vanchel.moviecon.data.network.models.MovieJsonResult
-import com.vanchel.moviecon.data.network.models.PersonJsonResult
-import com.vanchel.moviecon.data.network.models.TvJsonResult
 import com.vanchel.moviecon.data.network.services.TrendingService
 import com.vanchel.moviecon.data.paging.TrendingMoviesPagingSource
 import com.vanchel.moviecon.data.paging.TrendingPeoplePagingSource
@@ -27,23 +23,17 @@ import javax.inject.Inject
  * Основная реализация [TrendingRepository].
  *
  * @property trendingService Источник данных о трендах
- * @property movieConverter Конвертер информации о фильмах
- * @property tvConverter Конвертер информации о сериалах
- * @property personConverter Конвертер информации о людях
  * @property schedulers Планировщики для выполнения асинхронных задач
  */
 class TrendingRepositoryImpl @Inject constructor(
     private val trendingService: TrendingService,
-    private val movieConverter: EntityConverter<Movie, MovieJsonResult>,
-    private val tvConverter: EntityConverter<Tv, TvJsonResult>,
-    private val personConverter: EntityConverter<Person, PersonJsonResult>,
     private val schedulers: Schedulers
 ) : TrendingRepository {
     override fun getTrendingMoviesStream(): Flowable<PagingData<Movie>> {
         return Pager(
             config = PagingConfig(enablePlaceholders = false, pageSize = PAGE_SIZE),
             pagingSourceFactory = {
-                TrendingMoviesPagingSource(trendingService, movieConverter, schedulers)
+                TrendingMoviesPagingSource(trendingService, schedulers)
             }
         ).flowable
     }
@@ -52,7 +42,7 @@ class TrendingRepositoryImpl @Inject constructor(
         return Pager(
             config = PagingConfig(enablePlaceholders = false, pageSize = PAGE_SIZE),
             pagingSourceFactory = {
-                TrendingTvsPagingSource(trendingService, tvConverter, schedulers)
+                TrendingTvsPagingSource(trendingService, schedulers)
             }
         ).flowable
     }
@@ -61,7 +51,7 @@ class TrendingRepositoryImpl @Inject constructor(
         return Pager(
             config = PagingConfig(enablePlaceholders = false, pageSize = PAGE_SIZE),
             pagingSourceFactory = {
-                TrendingPeoplePagingSource(trendingService, personConverter, schedulers)
+                TrendingPeoplePagingSource(trendingService, schedulers)
             }
         ).flowable
     }

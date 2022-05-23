@@ -19,7 +19,7 @@ interface MoviesService {
      * @return Подробная информация о запрашиваемом фильме
      */
     @GET("movie/{movie_id}?append_to_response=videos,credits")
-    fun getDetails(@Path("movie_id") movieId: Int): Single<MovieDetailsJsonResult>
+    fun getDetails(@Path("movie_id") movieId: Int): Single<MovieDetailsResponse>
 
     /**
      * Запрашивает информацию о съемочной группе фильма.
@@ -28,7 +28,7 @@ interface MoviesService {
      * @return Информация о съемочной группе фильма
      */
     @GET("movie/{movie_id}/credits")
-    fun getCredits(@Path("movie_id") movieId: Int): Single<CinematicCreditsJsonResult>
+    fun getCredits(@Path("movie_id") movieId: Int): Single<CinematicCreditsResponse>
 
     /**
      * Запрашивает информацию об изображениях, приложенных к фильму.
@@ -37,7 +37,7 @@ interface MoviesService {
      * @return Информация об изображениях
      */
     @GET("movie/{movie_id}/images")
-    fun getImages(@Path("movie_id") movieId: Int): Single<ImagesJsonResult>
+    fun getImages(@Path("movie_id") movieId: Int): Single<ImagesResponse>
 
     /**
      * Запрашивает список популярных фильмов.
@@ -46,7 +46,7 @@ interface MoviesService {
      * @return Данные о популярных фильмах
      */
     @GET("movie/popular")
-    fun getPopular(@Query("page") page: Int = 1): Single<PageJsonResult<MovieJsonResult>>
+    fun getPopular(@Query("page") page: Int = 1): Single<PageResponse<MovieResponse>>
 
     /**
      * Запрашивает список просматриваемых сейчас фильмов.
@@ -55,7 +55,7 @@ interface MoviesService {
      * @return Данные о просматриваемых сейчас фильмах
      */
     @GET("movie/now_playing")
-    fun getNowPlaying(@Query("page") page: Int = 1): Single<PageJsonResult<MovieJsonResult>>
+    fun getNowPlaying(@Query("page") page: Int = 1): Single<PageResponse<MovieResponse>>
 
     /**
      * Запрашивает список ожидаемых фильмов.
@@ -64,7 +64,7 @@ interface MoviesService {
      * @return Данные об ожидаемых фильмах
      */
     @GET("movie/upcoming")
-    fun getUpcoming(@Query("page") page: Int = 1): Single<PageJsonResult<MovieJsonResult>>
+    fun getUpcoming(@Query("page") page: Int = 1): Single<PageResponse<MovieResponse>>
 
     /**
      * Запрашивает список лучших фильмов.
@@ -73,5 +73,5 @@ interface MoviesService {
      * @return Данные о лучших фильмах
      */
     @GET("movie/top_rated")
-    fun getTopRated(@Query("page") page: Int = 1): Single<PageJsonResult<MovieJsonResult>>
+    fun getTopRated(@Query("page") page: Int = 1): Single<PageResponse<MovieResponse>>
 }

@@ -20,7 +20,7 @@ package com.vanchel.moviecon.domain.entities
 data class Cast(
     val id: Int,
     val isAdult: Boolean,
-    val gender: Int?,
+    val gender: Gender,
     val knownForDepartment: String,
     val name: String,
     val popularity: Double,

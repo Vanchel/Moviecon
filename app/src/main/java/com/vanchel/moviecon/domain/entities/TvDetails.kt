@@ -59,7 +59,7 @@ data class TvDetails(
     val languages: List<String>,
     val voteAverage: Double,
     val genreIds: List<Int>,
-    val status: String,
+    val status: CinematicStatus,
     val tagline: String,
     val type: String,
     val posterPath: String?,

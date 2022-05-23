@@ -7,16 +7,6 @@ package com.vanchel.moviecon.util
  */
 
 /**
- * Url для обращения к API сервиса TMDB
- */
-const val BASE_URL = "https://api.themoviedb.org/3/"
-
-/**
- * Url для получения изображений с сервиса TMDB
- */
-const val BASE_URL_IMAGE = "https://image.tmdb.org/t/p/"
-
-/**
  * Размер одной страницы с данными при использовании пагинации на сервисе TMDB
  */
 const val PAGE_SIZE = 20

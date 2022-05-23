@@ -2,8 +2,7 @@ package com.vanchel.moviecon.data.paging
 
 import androidx.paging.PagingState
 import androidx.paging.rxjava2.RxPagingSource
-import com.vanchel.moviecon.data.EntityConverter
-import com.vanchel.moviecon.data.network.models.TvJsonResult
+import com.vanchel.moviecon.data.network.models.TvResponse
 import com.vanchel.moviecon.data.network.services.TvService
 import com.vanchel.moviecon.domain.entities.Tv
 import com.vanchel.moviecon.domain.entities.TvType
@@ -18,7 +17,6 @@ private const val STARTING_PAGE_INDEX = 1
  * [PagingSource][RxPagingSource] для постраничного получения сериалов.
  *
  * @property service Источник данных о сериалах
- * @property resultConverter Конвертер полученных данных
  * @property schedulers Планировщики для выполнения асинхронных задач
  * @constructor Создает [PagingSource][RxPagingSource] для получения информации о сериалах
  *
@@ -26,7 +24,6 @@ private const val STARTING_PAGE_INDEX = 1
  */
 class TvsPagingSource(
     private val service: TvService,
-    private val resultConverter: EntityConverter<Tv, TvJsonResult>,
     private val schedulers: Schedulers,
     type: TvType
 ) : RxPagingSource<Int, Tv>() {
@@ -38,7 +35,7 @@ class TvsPagingSource(
             .subscribeOn(schedulers.io)
             .map<LoadResult<Int, Tv>> { result ->
                 LoadResult.Page(
-                    data = result.results.map(resultConverter::toDomainModel),
+                    data = result.results?.map(TvResponse::transform) ?: emptyList(),
                     prevKey = if (page == STARTING_PAGE_INDEX) null else page - 1,
                     nextKey = if (page == result.totalPages) null else page + 1
                 )
