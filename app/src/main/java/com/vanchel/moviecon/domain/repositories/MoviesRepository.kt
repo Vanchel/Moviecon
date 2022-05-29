@@ -2,8 +2,7 @@ package com.vanchel.moviecon.domain.repositories
 
 import androidx.paging.PagingData
 import com.vanchel.moviecon.domain.entities.*
-import io.reactivex.Flowable
-import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Иван Тимашов
@@ -17,7 +16,7 @@ interface MoviesRepository {
      * @param movieId Идентификатор фильма
      * @return Подробная инорфмация о фильме
      */
-    fun getMovieDetails(movieId: Int): Single<MovieDetails>
+    suspend fun getMovieDetails(movieId: Int): MovieDetails
 
     /**
      * Получает информацию о съемочной группе фильма.
@@ -25,7 +24,7 @@ interface MoviesRepository {
      * @param movieId Идентификатор фильма
      * @return Информация о съемочной группе фильма
      */
-    fun getMovieCredits(movieId: Int): Single<List<Cast>>
+    suspend fun getMovieCredits(movieId: Int): List<Cast>
 
     /**
      * Получает информацию об изображениях, приложенных к фильму.
@@ -33,7 +32,7 @@ interface MoviesRepository {
      * @param movieId Идентификатор фильма
      * @return Информация об изображениях
      */
-    fun getMovieImages(movieId: Int): Single<Images>
+    suspend fun getMovieImages(movieId: Int): Images
 
     /**
      * Получает поток фильмов, входящих в категорию [type].
@@ -41,5 +40,5 @@ interface MoviesRepository {
      * @param type Тип запрашиваемых фильмов
      * @return Поток фильмов из указанной категории
      */
-    fun getMoviesStream(type: MovieType): Flowable<PagingData<Movie>>
+    fun getMoviesStream(type: MovieType): Flow<PagingData<Movie>>
 }

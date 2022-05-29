@@ -4,7 +4,6 @@ import com.vanchel.moviecon.data.network.models.MovieResponse
 import com.vanchel.moviecon.data.network.models.PageResponse
 import com.vanchel.moviecon.data.network.models.PersonResponse
 import com.vanchel.moviecon.data.network.models.TvResponse
-import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -25,7 +24,7 @@ interface TrendingService {
      * @return Данные о фильмах в тренде
      */
     @GET("trending/$MEDIA_TYPE_MOVIE/day")
-    fun trendingMovie(@Query("page") page: Int = 1): Single<PageResponse<MovieResponse>>
+    suspend fun trendingMovie(@Query("page") page: Int = 1): PageResponse<MovieResponse>
 
     /**
      * Запрашивает список сериалов, которые сегодня в тренде.
@@ -34,7 +33,7 @@ interface TrendingService {
      * @return Данные о сериалах в тренде
      */
     @GET("trending/$MEDIA_TYPE_TV/day")
-    fun trendingTv(@Query("page") page: Int = 1): Single<PageResponse<TvResponse>>
+    suspend fun trendingTv(@Query("page") page: Int = 1): PageResponse<TvResponse>
 
     /**
      * Запрашивает список людей, которые сегодня в тренде.
@@ -43,5 +42,5 @@ interface TrendingService {
      * @return Данные о людях в тренде
      */
     @GET("trending/$MEDIA_TYPE_PERSON/day")
-    fun trendingPerson(@Query("page") page: Int = 1): Single<PageResponse<PersonResponse>>
+    suspend fun trendingPerson(@Query("page") page: Int = 1): PageResponse<PersonResponse>
 }

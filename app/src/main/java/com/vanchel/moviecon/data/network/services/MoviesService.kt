@@ -1,7 +1,6 @@
 package com.vanchel.moviecon.data.network.services
 
 import com.vanchel.moviecon.data.network.models.*
-import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -19,7 +18,7 @@ interface MoviesService {
      * @return Подробная информация о запрашиваемом фильме
      */
     @GET("movie/{movie_id}?append_to_response=videos,credits")
-    fun getDetails(@Path("movie_id") movieId: Int): Single<MovieDetailsResponse>
+    suspend fun getDetails(@Path("movie_id") movieId: Int): MovieDetailsResponse
 
     /**
      * Запрашивает информацию о съемочной группе фильма.
@@ -28,7 +27,7 @@ interface MoviesService {
      * @return Информация о съемочной группе фильма
      */
     @GET("movie/{movie_id}/credits")
-    fun getCredits(@Path("movie_id") movieId: Int): Single<CinematicCreditsResponse>
+    suspend fun getCredits(@Path("movie_id") movieId: Int): CinematicCreditsResponse
 
     /**
      * Запрашивает информацию об изображениях, приложенных к фильму.
@@ -37,7 +36,7 @@ interface MoviesService {
      * @return Информация об изображениях
      */
     @GET("movie/{movie_id}/images")
-    fun getImages(@Path("movie_id") movieId: Int): Single<ImagesResponse>
+    suspend fun getImages(@Path("movie_id") movieId: Int): ImagesResponse
 
     /**
      * Запрашивает список популярных фильмов.
@@ -46,7 +45,7 @@ interface MoviesService {
      * @return Данные о популярных фильмах
      */
     @GET("movie/popular")
-    fun getPopular(@Query("page") page: Int = 1): Single<PageResponse<MovieResponse>>
+    suspend fun getPopular(@Query("page") page: Int = 1): PageResponse<MovieResponse>
 
     /**
      * Запрашивает список просматриваемых сейчас фильмов.
@@ -55,7 +54,7 @@ interface MoviesService {
      * @return Данные о просматриваемых сейчас фильмах
      */
     @GET("movie/now_playing")
-    fun getNowPlaying(@Query("page") page: Int = 1): Single<PageResponse<MovieResponse>>
+    suspend fun getNowPlaying(@Query("page") page: Int = 1): PageResponse<MovieResponse>
 
     /**
      * Запрашивает список ожидаемых фильмов.
@@ -64,7 +63,7 @@ interface MoviesService {
      * @return Данные об ожидаемых фильмах
      */
     @GET("movie/upcoming")
-    fun getUpcoming(@Query("page") page: Int = 1): Single<PageResponse<MovieResponse>>
+    suspend fun getUpcoming(@Query("page") page: Int = 1): PageResponse<MovieResponse>
 
     /**
      * Запрашивает список лучших фильмов.
@@ -73,5 +72,5 @@ interface MoviesService {
      * @return Данные о лучших фильмах
      */
     @GET("movie/top_rated")
-    fun getTopRated(@Query("page") page: Int = 1): Single<PageResponse<MovieResponse>>
+    suspend fun getTopRated(@Query("page") page: Int = 1): PageResponse<MovieResponse>
 }

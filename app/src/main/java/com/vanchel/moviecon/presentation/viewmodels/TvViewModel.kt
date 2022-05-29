@@ -7,13 +7,10 @@ import com.vanchel.moviecon.domain.entities.TvDetails
 import com.vanchel.moviecon.domain.repositories.TvRepository
 import com.vanchel.moviecon.presentation.utils.Event
 import com.vanchel.moviecon.presentation.utils.Resource
-import com.vanchel.moviecon.util.Schedulers
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import io.reactivex.SingleObserver
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.launch
 
 private const val TAG = "TvViewModel"
 
@@ -23,15 +20,12 @@ private const val TAG = "TvViewModel"
  * [ViewModel] экрана подробной информации о сериале.
  *
  * @property tvRepository репозиторий доступа к данным о сериалах
- * @property schedulers планировщики для выполнения асинхронных задач
  * @property tvId идентификатор сериала
  */
 class TvViewModel @AssistedInject constructor(
     private val tvRepository: TvRepository,
-    private val schedulers: Schedulers,
     @Assisted private val tvId: Int
 ) : ViewModel() {
-    private val disposable = CompositeDisposable()
 
     /**
      * [Resource], содержащий состояние данных о конкретном сериале.
@@ -127,28 +121,16 @@ class TvViewModel @AssistedInject constructor(
 
     private fun getTvDetails() {
         _tvDetailsResource.value = Resource.Loading()
-        tvRepository.getTvDetails(tvId)
-            .subscribeOn(schedulers.io)
-            .observeOn(schedulers.ui)
-            .subscribe(object : SingleObserver<TvDetails> {
-                override fun onSubscribe(d: Disposable) {
-                    disposable.add(d)
-                }
-
-                override fun onSuccess(t: TvDetails) {
-                    _tvDetailsResource.value = Resource.Success(t)
-                }
-
-                override fun onError(e: Throwable) {
-                    _tvDetailsResource.value = Resource.Error("Error: ${e.message}")
-                    Log.e(TAG, "getTvDetails: ${e.message}")
-                }
-            })
-    }
-
-    override fun onCleared() {
-        disposable.clear()
-        super.onCleared()
+        viewModelScope.launch {
+            try {
+                val result = tvRepository.getTvDetails(tvId)
+                _tvDetailsResource.value = Resource.Success(result)
+            } catch (e: Exception) {
+                // TODO обрабатывать соответствующие исключения
+                _tvDetailsResource.value = Resource.Error("Error: ${e.message}")
+                Log.e(TAG, "getTvDetails: ${e.message}")
+            }
+        }
     }
 
     companion object {

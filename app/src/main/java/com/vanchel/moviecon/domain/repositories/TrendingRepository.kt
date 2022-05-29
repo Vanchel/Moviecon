@@ -4,7 +4,7 @@ import androidx.paging.PagingData
 import com.vanchel.moviecon.domain.entities.Movie
 import com.vanchel.moviecon.domain.entities.Person
 import com.vanchel.moviecon.domain.entities.Tv
-import io.reactivex.Flowable
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Иван Тимашов
@@ -17,19 +17,19 @@ interface TrendingRepository {
      *
      * @return Поток трендовых фильмов
      */
-    fun getTrendingMoviesStream(): Flowable<PagingData<Movie>>
+    fun getTrendingMoviesStream(): Flow<PagingData<Movie>>
 
     /**
      * Получает поток трендовых сериалов.
      *
      * @return Поток трендовых сериалов
      */
-    fun getTrendingTvsStream(): Flowable<PagingData<Tv>>
+    fun getTrendingTvsStream(): Flow<PagingData<Tv>>
 
     /**
      * Получает поток трендовых людей.
      *
      * @return Поток трендовых людей
      */
-    fun getTrendingPeopleStream(): Flowable<PagingData<Person>>
+    fun getTrendingPeopleStream(): Flow<PagingData<Person>>
 }

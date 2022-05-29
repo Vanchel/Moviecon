@@ -1,7 +1,7 @@
 package com.vanchel.moviecon.presentation.viewmodels
 
 import androidx.lifecycle.*
-import androidx.paging.rxjava2.cachedIn
+import androidx.paging.cachedIn
 import com.vanchel.moviecon.domain.entities.Movie
 import com.vanchel.moviecon.domain.entities.Person
 import com.vanchel.moviecon.domain.entities.Tv
@@ -47,23 +47,23 @@ class MainViewModel @Inject constructor(
     /**
      * Поток трендовых фильмов для отображения
      */
-    val movies = LiveDataReactiveStreams.fromPublisher(
-        repository.getTrendingMoviesStream().cachedIn(viewModelScope)
-    )
+    val movies = repository.getTrendingMoviesStream()
+        .cachedIn(viewModelScope)
+        .asLiveData()
 
     /**
      * Поток трендовых сериалов для отображения
      */
-    val tvs = LiveDataReactiveStreams.fromPublisher(
-        repository.getTrendingTvsStream().cachedIn(viewModelScope)
-    )
+    val tvs = repository.getTrendingTvsStream()
+        .cachedIn(viewModelScope)
+        .asLiveData()
 
     /**
      * Поток трендовых людей для отображения
      */
-    val people = LiveDataReactiveStreams.fromPublisher(
-        repository.getTrendingPeopleStream().cachedIn(viewModelScope)
-    )
+    val people = repository.getTrendingPeopleStream()
+        .cachedIn(viewModelScope)
+        .asLiveData()
 
     /**
      * Метод для обработки выбора фильма

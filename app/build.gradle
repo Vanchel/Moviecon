@@ -67,17 +67,14 @@ dependencies {
 
     // Network
     implementation "com.squareup.retrofit2:converter-moshi:$rootProject.retrofitVersion"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:$rootProject.retrofitVersion"
     implementation "com.squareup.moshi:moshi-kotlin:$rootProject.moshiVersion"
     implementation "com.squareup.okhttp3:logging-interceptor:$rootProject.okHttpVersion"
 
-    // Rx
-    implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxJavaVersion"
-    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxAndroidVersion"
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.kotlinVersion"
 
     // Paging
     implementation "androidx.paging:paging-runtime-ktx:$rootProject.pagingVersion"
-    implementation "androidx.paging:paging-rxjava2:$rootProject.pagingVersion"
 
     // CircleImageView
     implementation "de.hdodenhof:circleimageview:$rootProject.circleImageViewVersion"

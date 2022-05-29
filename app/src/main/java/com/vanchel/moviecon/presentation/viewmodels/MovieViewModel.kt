@@ -7,13 +7,10 @@ import com.vanchel.moviecon.domain.entities.MovieDetails
 import com.vanchel.moviecon.domain.repositories.MoviesRepository
 import com.vanchel.moviecon.presentation.utils.Event
 import com.vanchel.moviecon.presentation.utils.Resource
-import com.vanchel.moviecon.util.Schedulers
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import io.reactivex.SingleObserver
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.launch
 
 private const val TAG = "MovieViewModel"
 
@@ -23,15 +20,12 @@ private const val TAG = "MovieViewModel"
  * [ViewModel] экрана подробной информации о фильме.
  *
  * @property moviesRepository репозиторий доступа к данным о фильмах
- * @property schedulers планировщики для выполнения асинхронных задач
  * @property movieId идентификатор фильма
  */
 class MovieViewModel @AssistedInject constructor(
     private val moviesRepository: MoviesRepository,
-    private val schedulers: Schedulers,
     @Assisted private val movieId: Int
 ) : ViewModel() {
-    private val disposable = CompositeDisposable()
 
     /**
      * [Resource], содержащий состояние данных о конкретном фильме.
@@ -127,28 +121,16 @@ class MovieViewModel @AssistedInject constructor(
 
     private fun getMovieDetails() {
         _movieDetailsResource.value = Resource.Loading()
-        moviesRepository.getMovieDetails(movieId)
-            .subscribeOn(schedulers.io)
-            .observeOn(schedulers.ui)
-            .subscribe(object : SingleObserver<MovieDetails> {
-                override fun onSubscribe(d: Disposable) {
-                    disposable.add(d)
-                }
-
-                override fun onSuccess(t: MovieDetails) {
-                    _movieDetailsResource.value = Resource.Success(t)
-                }
-
-                override fun onError(e: Throwable) {
-                    _movieDetailsResource.value = Resource.Error("Error: ${e.message}")
-                    Log.e(TAG, "getMovieDetails: ${e.message}")
-                }
-            })
-    }
-
-    override fun onCleared() {
-        disposable.clear()
-        super.onCleared()
+        viewModelScope.launch {
+            try {
+                val result = moviesRepository.getMovieDetails(movieId)
+                _movieDetailsResource.value = Resource.Success(result)
+            } catch (e: Exception) {
+                // TODO обрабатывать соответствующие исключения
+                _movieDetailsResource.value = Resource.Error("Error: ${e.message}")
+                Log.e(TAG, "getMovieDetails: ${e.message}")
+            }
+        }
     }
 
     companion object {

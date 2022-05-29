@@ -1,9 +1,13 @@
 package com.vanchel.moviecon.di
 
-import com.vanchel.moviecon.data.repositories.*
-import com.vanchel.moviecon.domain.repositories.*
-import com.vanchel.moviecon.util.Schedulers
-import com.vanchel.moviecon.util.SchedulersImpl
+import com.vanchel.moviecon.data.repositories.MoviesRepositoryImpl
+import com.vanchel.moviecon.data.repositories.PeopleRepositoryImpl
+import com.vanchel.moviecon.data.repositories.TrendingRepositoryImpl
+import com.vanchel.moviecon.data.repositories.TvRepositoryImpl
+import com.vanchel.moviecon.domain.repositories.MoviesRepository
+import com.vanchel.moviecon.domain.repositories.PeopleRepository
+import com.vanchel.moviecon.domain.repositories.TrendingRepository
+import com.vanchel.moviecon.domain.repositories.TvRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

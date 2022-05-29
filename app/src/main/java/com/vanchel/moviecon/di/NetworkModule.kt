@@ -5,7 +5,10 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.vanchel.moviecon.BuildConfig
 import com.vanchel.moviecon.data.network.BASE_URL
 import com.vanchel.moviecon.data.network.interceptors.AuthInterceptor
-import com.vanchel.moviecon.data.network.services.*
+import com.vanchel.moviecon.data.network.services.MoviesService
+import com.vanchel.moviecon.data.network.services.PeopleService
+import com.vanchel.moviecon.data.network.services.TrendingService
+import com.vanchel.moviecon.data.network.services.TvService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +16,6 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
@@ -93,7 +95,6 @@ object NetworkModule {
     fun provideRetrofit(moshi: Moshi, okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .baseUrl(BASE_URL)
             .client(okHttpClient)
             .build()

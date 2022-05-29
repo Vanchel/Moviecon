@@ -4,8 +4,7 @@ import androidx.paging.PagingData
 import com.vanchel.moviecon.domain.entities.Person
 import com.vanchel.moviecon.domain.entities.PersonDetails
 import com.vanchel.moviecon.domain.entities.PersonType
-import io.reactivex.Flowable
-import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Иван Тимашов
@@ -19,7 +18,7 @@ interface PeopleRepository {
      * @param personId Идентификатор человека
      * @return Подробная инорфмация о человеке
      */
-    fun getPersonDetails(personId: Int): Single<PersonDetails>
+    suspend fun getPersonDetails(personId: Int): PersonDetails
 
     /**
      * Получает поток людей, входящих в категорию [type].
@@ -27,5 +26,5 @@ interface PeopleRepository {
      * @param type Тип запрашиваемых людей
      * @return Поток людей из указанной категории
      */
-    fun getPeopleStream(type: PersonType): Flowable<PagingData<Person>>
+    fun getPeopleStream(type: PersonType): Flow<PagingData<Person>>
 }

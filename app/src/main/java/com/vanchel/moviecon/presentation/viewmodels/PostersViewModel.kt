@@ -4,18 +4,14 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.vanchel.moviecon.domain.entities.CinematicType
 import com.vanchel.moviecon.domain.entities.Image
-import com.vanchel.moviecon.domain.entities.Images
 import com.vanchel.moviecon.domain.repositories.MoviesRepository
 import com.vanchel.moviecon.domain.repositories.TvRepository
 import com.vanchel.moviecon.presentation.utils.Event
 import com.vanchel.moviecon.presentation.utils.Resource
-import com.vanchel.moviecon.util.Schedulers
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import io.reactivex.SingleObserver
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.launch
 
 private const val TAG = "PostersViewModel"
 
@@ -26,18 +22,15 @@ private const val TAG = "PostersViewModel"
  *
  * @property moviesRepository репозиторий доступа к данным о фильмах
  * @property tvRepository репозиторий доступа к данным о сериалах
- * @property schedulers планировщики для выполнения асинхронных задач
  * @property cinematicId идентификатор картины
  * @property cinematicType тип картины
  */
 class PostersViewModel @AssistedInject constructor(
     private val moviesRepository: MoviesRepository,
     private val tvRepository: TvRepository,
-    private val schedulers: Schedulers,
     @Assisted private val cinematicId: Int,
     @Assisted private val cinematicType: CinematicType
 ) : ViewModel() {
-    private val disposable = CompositeDisposable()
 
     /**
      * [Resource], содержащий состояние данных о постерах.
@@ -88,31 +81,20 @@ class PostersViewModel @AssistedInject constructor(
 
     private fun getPosters() {
         _postersResource.value = Resource.Loading()
-        val single = when (cinematicType) {
-            CinematicType.MOVIE -> moviesRepository.getMovieImages(cinematicId)
-            CinematicType.TV -> tvRepository.getTvImages(cinematicId)
+
+        viewModelScope.launch {
+            try {
+                val result = when (cinematicType) {
+                    CinematicType.MOVIE -> moviesRepository.getMovieImages(cinematicId)
+                    CinematicType.TV -> tvRepository.getTvImages(cinematicId)
+                }
+                _postersResource.value = Resource.Success(result.posters)
+            } catch (e: Exception) {
+                // TODO обрабатывать соответствующие исключения
+                _postersResource.value = Resource.Error("Error: ${e.message}")
+                Log.e(TAG, "getPosters: ${e.message}")
+            }
         }
-        single.subscribeOn(schedulers.io)
-            .observeOn(schedulers.ui)
-            .subscribe(object : SingleObserver<Images> {
-                override fun onSubscribe(d: Disposable) {
-                    disposable.add(d)
-                }
-
-                override fun onSuccess(t: Images) {
-                    _postersResource.value = Resource.Success(t.posters)
-                }
-
-                override fun onError(e: Throwable) {
-                    _postersResource.value = Resource.Error("Error: ${e.message}")
-                    Log.e(TAG, "getPosters: ${e.message}")
-                }
-            })
-    }
-
-    override fun onCleared() {
-        disposable.clear()
-        super.onCleared()
     }
 
     companion object {

@@ -2,8 +2,7 @@ package com.vanchel.moviecon.domain.repositories
 
 import androidx.paging.PagingData
 import com.vanchel.moviecon.domain.entities.*
-import io.reactivex.Flowable
-import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 /**
  * @author Иван Тимашов
@@ -17,7 +16,7 @@ interface TvRepository {
      * @param tvId Идентификатор сериала
      * @return Подробная инорфмация о сериале
      */
-    fun getTvDetails(tvId: Int): Single<TvDetails>
+    suspend fun getTvDetails(tvId: Int): TvDetails
 
     /**
      * Получает информацию о съемочной группе сериала.
@@ -25,7 +24,7 @@ interface TvRepository {
      * @param tvId Идентификатор сериала
      * @return Информация о съемочной группе сериала
      */
-    fun getTvCredits(tvId: Int): Single<List<Cast>>
+    suspend fun getTvCredits(tvId: Int): List<Cast>
 
     /**
      * Получает информацию об изображениях, приложенных к сериалу.
@@ -33,7 +32,7 @@ interface TvRepository {
      * @param tvId Идентификатор сериала
      * @return Информация об изображениях
      */
-    fun getTvImages(tvId: Int): Single<Images>
+    suspend fun getTvImages(tvId: Int): Images
 
     /**
      * Получает поток сериалов, входящих в категорию [type].
@@ -41,5 +40,5 @@ interface TvRepository {
      * @param type Тип запрашиваемых сериалов
      * @return Поток сериалов из указанной категории
      */
-    fun getTvsStream(type: TvType): Flowable<PagingData<Tv>>
+    fun getTvsStream(type: TvType): Flow<PagingData<Tv>>
 }

@@ -4,17 +4,13 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.vanchel.moviecon.domain.entities.CinematicType
 import com.vanchel.moviecon.domain.entities.Credit
-import com.vanchel.moviecon.domain.entities.PersonDetails
 import com.vanchel.moviecon.domain.repositories.PeopleRepository
 import com.vanchel.moviecon.presentation.utils.Event
 import com.vanchel.moviecon.presentation.utils.Resource
-import com.vanchel.moviecon.util.Schedulers
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import io.reactivex.SingleObserver
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.launch
 
 private const val TAG = "FilmographyViewModel"
 
@@ -25,15 +21,12 @@ private const val TAG = "FilmographyViewModel"
  * [ViewModel] экрана фильмографии актера.
  *
  * @property peopleRepository репозиторий доступа к данным о людях
- * @property schedulers планировщики для выполнения асинхронных задач
  * @property personId идентификатор человека
  */
 class FilmographyViewModel @AssistedInject constructor(
     private val peopleRepository: PeopleRepository,
-    private val schedulers: Schedulers,
     @Assisted private val personId: Int
 ) : ViewModel() {
-    private val disposable = CompositeDisposable()
 
     /**
      * [Resource], содержащий состояние списка фильмов и сериалов, в съемках
@@ -95,30 +88,18 @@ class FilmographyViewModel @AssistedInject constructor(
 
     private fun getCredits() {
         _creditsResource.value = Resource.Loading()
-        peopleRepository.getPersonDetails(personId)
-            .subscribeOn(schedulers.io)
-            .observeOn(schedulers.ui)
-            .subscribe(object : SingleObserver<PersonDetails> {
-                override fun onSubscribe(d: Disposable) {
-                    disposable.add(d)
-                }
-
-                override fun onSuccess(t: PersonDetails) {
-                    val sortedCredits = t.credits.sortedByDescending(Credit::date)
-                    _creditsResource.value = Resource.Success(sortedCredits)
-                }
-
-                override fun onError(e: Throwable) {
-                    _creditsResource.value = Resource.Error("Error: ${e.message}")
-                    Log.e(TAG, "getPersonDetails")
-                    e.printStackTrace()
-                }
-            })
-    }
-
-    override fun onCleared() {
-        disposable.clear()
-        super.onCleared()
+        viewModelScope.launch {
+            try {
+                val result = peopleRepository.getPersonDetails(personId)
+                val sortedCredits = result.credits.sortedByDescending(Credit::date)
+                _creditsResource.value = Resource.Success(sortedCredits)
+            } catch (e: Exception) {
+                // TODO обрабатывать соответствующие исключения
+                _creditsResource.value = Resource.Error("Error: ${e.message}")
+                Log.e(TAG, "getPersonDetails")
+                e.printStackTrace()
+            }
+        }
     }
 
     companion object {

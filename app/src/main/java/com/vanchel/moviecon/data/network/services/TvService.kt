@@ -1,7 +1,6 @@
 package com.vanchel.moviecon.data.network.services
 
 import com.vanchel.moviecon.data.network.models.*
-import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -19,7 +18,7 @@ interface TvService {
      * @return Подробная информация о запрашиваемом сериале
      */
     @GET("tv/{tv_id}?append_to_response=videos,credits")
-    fun getDetails(@Path("tv_id") tvId: Int): Single<TvDetailsResponse>
+    suspend fun getDetails(@Path("tv_id") tvId: Int): TvDetailsResponse
 
     /**
      * Запрашивает информацию о съемочной группе сериала.
@@ -28,7 +27,7 @@ interface TvService {
      * @return Информация о съемочной группе сериала
      */
     @GET("tv/{tv_id}/credits")
-    fun getCredits(@Path("tv_id") tvId: Int): Single<CinematicCreditsResponse>
+    suspend fun getCredits(@Path("tv_id") tvId: Int): CinematicCreditsResponse
 
     /**
      * Запрашивает информацию об изображениях, приложенных к сериалу.
@@ -37,7 +36,7 @@ interface TvService {
      * @return Информация об изображениях
      */
     @GET("tv/{tv_id}/images")
-    fun getImages(@Path("tv_id") tvId: Int): Single<ImagesResponse>
+    suspend fun getImages(@Path("tv_id") tvId: Int): ImagesResponse
 
     /**
      * Запрашивает список популярных сериалов.
@@ -46,7 +45,7 @@ interface TvService {
      * @return Данные о популярных сериалах
      */
     @GET("tv/popular")
-    fun getPopular(@Query("page") page: Int = 1): Single<PageResponse<TvResponse>>
+    suspend fun getPopular(@Query("page") page: Int = 1): PageResponse<TvResponse>
 
     /**
      * Запрашивает список сериалов, которые сегодня в эфире.
@@ -55,7 +54,7 @@ interface TvService {
      * @return Данные о сериалах, которые сегодня в эфире
      */
     @GET("tv/airing_today")
-    fun getTvAiringToday(@Query("page") page: Int = 1): Single<PageResponse<TvResponse>>
+    suspend fun getTvAiringToday(@Query("page") page: Int = 1): PageResponse<TvResponse>
 
     /**
      * Запрашивает список сериалов, идущих по телевидению.
@@ -64,7 +63,7 @@ interface TvService {
      * @return Данные о сериалах, идущих по телевидению
      */
     @GET("tv/on_the_air")
-    fun getTvOnTheAir(@Query("page") page: Int = 1): Single<PageResponse<TvResponse>>
+    suspend fun getTvOnTheAir(@Query("page") page: Int = 1): PageResponse<TvResponse>
 
     /**
      * Запрашивает список лучших сериалов.
@@ -73,5 +72,5 @@ interface TvService {
      * @return Данные о лучших сериалах
      */
     @GET("tv/top_rated")
-    fun getTopRated(@Query("page") page: Int = 1): Single<PageResponse<TvResponse>>
+    suspend fun getTopRated(@Query("page") page: Int = 1): PageResponse<TvResponse>
 }

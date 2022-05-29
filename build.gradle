@@ -17,7 +17,7 @@ buildscript {
         hiltVersion = '2.40'
         jodaVersion = '2.10.12.2'
         junitVersion = '4.13.2'
-        kotlinVersion = '1.5.31'
+        kotlinVersion = '1.6.0'
         legacyVersion = '1.0.0'
         lifecycleVersion = '2.4.1'
         materialVersion = '1.6.0'
@@ -26,8 +26,6 @@ buildscript {
         okHttpVersion = '4.9.1'
         pagingVersion = '3.1.1'
         retrofitVersion = '2.9.0'
-        rxJavaVersion = '2.2.17'
-        rxAndroidVersion = '2.1.1'
         youTubeVersion = '10.0.5'
     }
     repositories {
@@ -36,7 +34,7 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradleVersion"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.21"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
     }

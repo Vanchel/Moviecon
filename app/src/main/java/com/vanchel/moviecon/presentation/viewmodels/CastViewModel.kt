@@ -8,13 +8,10 @@ import com.vanchel.moviecon.domain.repositories.MoviesRepository
 import com.vanchel.moviecon.domain.repositories.TvRepository
 import com.vanchel.moviecon.presentation.utils.Event
 import com.vanchel.moviecon.presentation.utils.Resource
-import com.vanchel.moviecon.util.Schedulers
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import io.reactivex.SingleObserver
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.launch
 
 private const val TAG = "CastViewModel"
 
@@ -25,18 +22,15 @@ private const val TAG = "CastViewModel"
  *
  * @property moviesRepository репозиторий доступа к данным о фильмах
  * @property tvRepository репозиторий доступа к данным о сериалах
- * @property schedulers планировщики для выполнения асинхронных задач
  * @property cinematicId идентификатор картины
  * @property cinematicType тип картины
  */
 class CastViewModel @AssistedInject constructor(
     private val moviesRepository: MoviesRepository,
     private val tvRepository: TvRepository,
-    private val schedulers: Schedulers,
     @Assisted private val cinematicId: Int,
     @Assisted private val cinematicType: CinematicType
 ) : ViewModel() {
-    private val disposable = CompositeDisposable()
 
     /**
      * [Resource], содержащий состояние списка актеров
@@ -87,31 +81,20 @@ class CastViewModel @AssistedInject constructor(
 
     private fun getCinematicCast() {
         _castResource.value = Resource.Loading()
-        val single = when (cinematicType) {
-            CinematicType.MOVIE -> moviesRepository.getMovieCredits(cinematicId)
-            CinematicType.TV -> tvRepository.getTvCredits(cinematicId)
+        viewModelScope.launch {
+            try {
+                val result = when (cinematicType) {
+                    CinematicType.MOVIE -> moviesRepository.getMovieCredits(cinematicId)
+                    CinematicType.TV -> tvRepository.getTvCredits(cinematicId)
+                }
+                _castResource.value = Resource.Success(result)
+
+            } catch (e: Exception) {
+                // TODO обрабатывать соответствующие исключения
+                _castResource.value = Resource.Error("Error: ${e.message}")
+                Log.e(TAG, "getCinematicCast: ${e.message}")
+            }
         }
-        single.subscribeOn(schedulers.io)
-            .observeOn(schedulers.ui)
-            .subscribe(object : SingleObserver<List<Cast>> {
-                override fun onSubscribe(d: Disposable) {
-                    disposable.add(d)
-                }
-
-                override fun onSuccess(t: List<Cast>) {
-                    _castResource.value = Resource.Success(t)
-                }
-
-                override fun onError(e: Throwable) {
-                    _castResource.value = Resource.Error("Error: ${e.message}")
-                    Log.e(TAG, "getCinematicCast: ${e.message}")
-                }
-            })
-    }
-
-    override fun onCleared() {
-        disposable.clear()
-        super.onCleared()
     }
 
     companion object {

@@ -1,10 +1,10 @@
 package com.vanchel.moviecon.presentation.viewmodels
 
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.rxjava2.cachedIn
+import androidx.paging.cachedIn
 import com.vanchel.moviecon.domain.entities.MovieType
 import com.vanchel.moviecon.domain.repositories.MoviesRepository
 import dagger.assisted.Assisted
@@ -28,9 +28,9 @@ class MoviesViewModel @AssistedInject constructor(
     /**
      * Поток фильмов для отображения
      */
-    val movies = LiveDataReactiveStreams.fromPublisher(
-        repository.getMoviesStream(type).cachedIn(viewModelScope)
-    )
+    val movies = repository.getMoviesStream(type)
+        .cachedIn(viewModelScope)
+        .asLiveData()
 
     companion object {
         /**
