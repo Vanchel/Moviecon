@@ -1,15 +1,18 @@
 package com.vanchel.moviecon.presentation.viewmodels
 
 import android.util.Log
-import androidx.lifecycle.*
-import com.vanchel.moviecon.domain.entities.Cast
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.vanchel.moviecon.domain.entities.TvDetails
 import com.vanchel.moviecon.domain.repositories.TvRepository
-import com.vanchel.moviecon.presentation.utils.Event
 import com.vanchel.moviecon.presentation.utils.Resource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val TAG = "TvViewModel"
@@ -30,52 +33,8 @@ class TvViewModel @AssistedInject constructor(
     /**
      * [Resource], содержащий состояние данных о конкретном сериале.
      */
-    private val _tvDetailsResource = MutableLiveData<Resource<TvDetails>>()
-    val tvDetailsResource: LiveData<Resource<TvDetails>>
-        get() = _tvDetailsResource
-
-    /**
-     * Флаг загрузки ресурса
-     */
-    val isLoading = Transformations.map(_tvDetailsResource) { it is Resource.Loading }
-
-    /**
-     * Флаг ошибки загрузки ресурса
-     */
-    val isError = Transformations.map(_tvDetailsResource) { it is Resource.Error }
-
-    /**
-     * Флаг успешности загрузки ресурса
-     */
-    val isSuccess = Transformations.map(_tvDetailsResource) { it is Resource.Success }
-
-    /**
-     * Событие перехода на экран с подробной информацией о человеке
-     */
-    private val _navigateToPersonDetails = MutableLiveData<Event<Cast>>()
-    val navigateToPersonDetails: LiveData<Event<Cast>>
-        get() = _navigateToPersonDetails
-
-    /**
-     * Событие перехода на экран с полным актерским составом
-     */
-    private val _navigateToCast = MutableLiveData<Event<Unit>>()
-    val navigateToCast: LiveData<Event<Unit>>
-        get() = _navigateToCast
-
-    /**
-     * Событие перехода на экран с постерами сериала
-     */
-    private val _navigateToPosters = MutableLiveData<Event<Unit>>()
-    val navigateToPosters: LiveData<Event<Unit>>
-        get() = _navigateToPosters
-
-    /**
-     * Событие перехода на экран просмотра трейлера к сериалу
-     */
-    private val _navigateToPlayer = MutableLiveData<Event<String>>()
-    val navigateToPlayer: LiveData<Event<String>>
-        get() = _navigateToPlayer
+    private val _tvDetailsResource = MutableStateFlow<Resource<TvDetails>?>(null)
+    val tvDetailsResource = _tvDetailsResource.asStateFlow()
 
     init {
         getTvDetails()
@@ -86,48 +45,15 @@ class TvViewModel @AssistedInject constructor(
      */
     fun reload() = getTvDetails()
 
-    /**
-     * Метод для обработки выбора актера, снимавшегося в сериале
-     *
-     * @param actor выбранный актер
-     */
-    fun selectCastPerson(actor: Cast) {
-        _navigateToPersonDetails.value = Event(actor)
-    }
-
-    /**
-     * Метод для обработки выбора актерского состава сериала
-     */
-    fun viewFullCast() {
-        _navigateToCast.value = Event(Unit)
-    }
-
-    /**
-     * Метод для обработки выбора постеров сериала
-     */
-    fun viewMoviePosters() {
-        _navigateToPosters.value = Event(Unit)
-    }
-
-    /**
-     * Метод для обработки выбора трейлера сериала
-     */
-    fun viewTrailer() {
-        val res = _tvDetailsResource.value
-        if (res is Resource.Success) {
-            res.data?.officialTrailer?.key?.let { _navigateToPlayer.value = Event(it) }
-        }
-    }
-
     private fun getTvDetails() {
-        _tvDetailsResource.value = Resource.Loading()
         viewModelScope.launch {
+            _tvDetailsResource.update { Resource.Loading() }
             try {
                 val result = tvRepository.getTvDetails(tvId)
-                _tvDetailsResource.value = Resource.Success(result)
+                _tvDetailsResource.update { Resource.Success(result) }
             } catch (e: Exception) {
                 // TODO обрабатывать соответствующие исключения
-                _tvDetailsResource.value = Resource.Error("Error: ${e.message}")
+                _tvDetailsResource.update { Resource.Error("Error: ${e.message}") }
                 Log.e(TAG, "getTvDetails: ${e.message}")
             }
         }

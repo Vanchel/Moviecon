@@ -85,3 +85,8 @@ const val DATE_FORMAT_DEFAULT = "yyyy-MM-dd"
  * Формат даты по умолчанию для отображения
  */
 const val DATE_FORMAT_UI = "dd.MM.yyyy"
+
+/**
+ * Задержка перед прекращением работы StateFlow
+ */
+const val STOP_TIMEOUT = 5000L

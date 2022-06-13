@@ -42,7 +42,7 @@ android {
         jvmTarget = '1.8'
     }
     buildFeatures {
-        dataBinding true
+        viewBinding true
     }
 }
 
@@ -55,7 +55,7 @@ dependencies {
     implementation "androidx.legacy:legacy-support-v4:$rootProject.legacyVersion"
 
     // Lifecycle
-    implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$rootProject.lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$rootProject.lifecycleVersion"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"

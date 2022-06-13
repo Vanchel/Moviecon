@@ -4,8 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -22,6 +26,7 @@ import com.vanchel.moviecon.presentation.viewmodels.MovieViewModel
 import com.vanchel.moviecon.util.DATE_FORMAT_UI
 import com.vanchel.moviecon.util.SIZE_BACKDROP_LARGE
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -53,12 +58,6 @@ class MovieFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMovieBinding.inflate(inflater, container, false)
-
-        binding.apply {
-            lifecycleOwner = viewLifecycleOwner
-            viewModel = movieViewModel
-        }
-
         return binding.root
     }
 
@@ -85,39 +84,17 @@ class MovieFragment : Fragment() {
     }
 
     private fun setViewModelObservers() {
-        movieViewModel.apply {
-            movieDetailsResource.observe(viewLifecycleOwner) { res ->
-                when (res) {
-                    is Resource.Success -> res.data?.let(::bindMovieDetailsData)
-                    else -> Unit
-                }
-            }
-            navigateToPersonDetails.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { actor ->
-                    navigate(MovieFragmentDirections.movieToPerson(actor.id, actor.name))
-                }
-            }
-            navigateToCast.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let {
-                    navigate(
-                        MovieFragmentDirections.movieToCast(
-                            args.movieId, CinematicType.MOVIE, args.movieName
-                        )
-                    )
-                }
-            }
-            navigateToPosters.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let {
-                    navigate(
-                        MovieFragmentDirections.movieToPosters(
-                            args.movieId, CinematicType.MOVIE, args.movieName
-                        )
-                    )
-                }
-            }
-            navigateToPlayer.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { videoId ->
-                    navigate(MovieFragmentDirections.movieToPlayer(videoId))
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                movieViewModel.movieDetailsResource.collect { resource ->
+                    if (resource is Resource.Success) {
+                        resource.data?.let(::bindMovieDetailsData)
+                    }
+                    binding.run {
+                        sectionContent.isVisible = resource is Resource.Success
+                        sectionLoading.root.isVisible = resource is Resource.Loading
+                        sectionError.root.isVisible = resource is Resource.Error
+                    }
                 }
             }
         }
@@ -125,9 +102,24 @@ class MovieFragment : Fragment() {
 
     private fun setOnClickListeners() {
         binding.apply {
-            textCast.setOnClickListener { movieViewModel.viewFullCast() }
-            textPosters.setOnClickListener { movieViewModel.viewMoviePosters() }
-            fabTrailer.setOnClickListener { movieViewModel.viewTrailer() }
+            textCast.setOnClickListener {
+                navigate(
+                    MovieFragmentDirections.movieToCast(
+                        cinematicId = args.movieId,
+                        type = CinematicType.MOVIE,
+                        cinematicName = args.movieName
+                    )
+                )
+            }
+            textPosters.setOnClickListener {
+                navigate(
+                    MovieFragmentDirections.movieToPosters(
+                        cinematicId = args.movieId,
+                        type = CinematicType.MOVIE,
+                        cinematicName = args.movieName
+                    )
+                )
+            }
             sectionError.buttonRetry.setOnClickListener { movieViewModel.reload() }
         }
     }
@@ -135,7 +127,7 @@ class MovieFragment : Fragment() {
     private fun setUpCastRecyclerView() {
         binding.recyclerViewCast.adapter = CastPanelAdapter(object : CastPanelAdapter.ItemCallback {
             override fun onItemSelected(item: Cast) {
-                movieViewModel.selectCastPerson(item)
+                navigate(MovieFragmentDirections.movieToPerson(item.id, item.name))
             }
         })
     }
@@ -147,10 +139,13 @@ class MovieFragment : Fragment() {
                 Glide.with(requireView())
                     .load(url).placeholder(R.drawable.img_backdrop).into(backdrop)
             }
-            fabTrailer.visibility = if (movieDetails.officialTrailer != null) {
-                View.VISIBLE
-            } else {
-                View.GONE
+            fabTrailer.run {
+                isVisible = movieDetails.officialTrailer != null
+                movieDetails.officialTrailer?.key?.let { videoKey ->
+                    setOnClickListener {
+                        navigate(MovieFragmentDirections.movieToPlayer(videoKey))
+                    }
+                }
             }
             textDate.text = movieDetails.releaseDate?.let {
                 SimpleDateFormat(DATE_FORMAT_UI, Locale.getDefault()).format(it)

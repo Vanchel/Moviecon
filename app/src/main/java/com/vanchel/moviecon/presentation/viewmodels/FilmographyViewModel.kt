@@ -1,15 +1,19 @@
 package com.vanchel.moviecon.presentation.viewmodels
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.vanchel.moviecon.domain.entities.CinematicType
 import com.vanchel.moviecon.domain.entities.Credit
 import com.vanchel.moviecon.domain.repositories.PeopleRepository
-import com.vanchel.moviecon.presentation.utils.Event
 import com.vanchel.moviecon.presentation.utils.Resource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val TAG = "FilmographyViewModel"
@@ -32,38 +36,20 @@ class FilmographyViewModel @AssistedInject constructor(
      * [Resource], содержащий состояние списка фильмов и сериалов, в съемках
      * которых человек принимал участие.
      */
-    private val _creditsResource = MutableLiveData<Resource<List<Credit>>>()
-    val creditsResource: LiveData<Resource<List<Credit>>>
-        get() = _creditsResource
+    private val _creditsResource = MutableStateFlow<Resource<List<Credit>>?>(null)
+    val creditsResource = _creditsResource.asStateFlow()
 
     /**
-     * Флаг загрузки ресурса
+     * Выбранный фильм
      */
-    val isLoading = Transformations.map(_creditsResource) { it is Resource.Loading }
+    private val _selectedMovie = MutableStateFlow<Credit?>(null)
+    val selectedMovie = _selectedMovie.asStateFlow()
 
     /**
-     * Флаг ошибки загрузки ресурса
+     * Выбранный сериал
      */
-    val isError = Transformations.map(_creditsResource) { it is Resource.Error }
-
-    /**
-     * Флаг успешности загрузки ресурса
-     */
-    val isSuccess = Transformations.map(_creditsResource) { it is Resource.Success }
-
-    /**
-     * Событие перехода на экран с подробной информацией о фильме
-     */
-    private val _navigateToMovie = MutableLiveData<Event<Credit>>()
-    val navigateToMovie: LiveData<Event<Credit>>
-        get() = _navigateToMovie
-
-    /**
-     * Событие перехода на экран с подробной информацией о сериале
-     */
-    private val _navigateToTv = MutableLiveData<Event<Credit>>()
-    val navigateToTv: LiveData<Event<Credit>>
-        get() = _navigateToTv
+    private val _selectedTv = MutableStateFlow<Credit?>(null)
+    val selectedTv = _selectedTv.asStateFlow()
 
     init {
         getCredits()
@@ -81,21 +67,35 @@ class FilmographyViewModel @AssistedInject constructor(
      */
     fun viewCredit(credit: Credit) {
         when (credit.type) {
-            CinematicType.MOVIE -> _navigateToMovie.value = Event(credit)
-            CinematicType.TV -> _navigateToTv.value = Event(credit)
+            CinematicType.MOVIE -> _selectedMovie.update { credit }
+            CinematicType.TV -> _selectedTv.update { credit }
         }
     }
 
+    /**
+     * Метод для сброса выбранного фильма
+     */
+    fun selectedMovieProcessed() {
+        _selectedMovie.update { null }
+    }
+
+    /**
+     * Метод для сброса выбранного сериала
+     */
+    fun selectedTvProcessed() {
+        _selectedTv.update { null }
+    }
+
     private fun getCredits() {
-        _creditsResource.value = Resource.Loading()
         viewModelScope.launch {
             try {
+                _creditsResource.update { Resource.Loading() }
                 val result = peopleRepository.getPersonDetails(personId)
                 val sortedCredits = result.credits.sortedByDescending(Credit::date)
-                _creditsResource.value = Resource.Success(sortedCredits)
+                _creditsResource.update { Resource.Success(sortedCredits) }
             } catch (e: Exception) {
                 // TODO обрабатывать соответствующие исключения
-                _creditsResource.value = Resource.Error("Error: ${e.message}")
+                _creditsResource.update { Resource.Error("Error: ${e.message}") }
                 Log.e(TAG, "getPersonDetails")
                 e.printStackTrace()
             }

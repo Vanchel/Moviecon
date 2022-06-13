@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
@@ -17,6 +20,8 @@ import com.vanchel.moviecon.presentation.adapters.BasicLoaderStateAdapter
 import com.vanchel.moviecon.presentation.adapters.PeopleAdapter
 import com.vanchel.moviecon.presentation.viewmodels.PeopleViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val ARG_PERSON_TYPE = "personType"
@@ -87,8 +92,10 @@ class PeopleListFragment : Fragment() {
     }
 
     private fun setViewModelObservers() {
-        peopleViewModel.people.observe(viewLifecycleOwner) { pagingData ->
-            peopleAdapter.submitData(lifecycle, pagingData)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                peopleViewModel.people.collectLatest(peopleAdapter::submitData)
+            }
         }
     }
 

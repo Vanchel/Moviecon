@@ -1,16 +1,20 @@
 package com.vanchel.moviecon.presentation.viewmodels
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.vanchel.moviecon.domain.entities.CinematicType
 import com.vanchel.moviecon.domain.entities.Image
 import com.vanchel.moviecon.domain.repositories.MoviesRepository
 import com.vanchel.moviecon.domain.repositories.TvRepository
-import com.vanchel.moviecon.presentation.utils.Event
 import com.vanchel.moviecon.presentation.utils.Resource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val TAG = "PostersViewModel"
@@ -31,35 +35,11 @@ class PostersViewModel @AssistedInject constructor(
     @Assisted private val cinematicId: Int,
     @Assisted private val cinematicType: CinematicType
 ) : ViewModel() {
-
     /**
      * [Resource], содержащий состояние данных о постерах.
      */
-    private val _postersResource = MutableLiveData<Resource<List<Image>>>()
-    val postersResource: LiveData<Resource<List<Image>>>
-        get() = _postersResource
-
-    /**
-     * Флаг загрузки ресурса
-     */
-    val isLoading = Transformations.map(_postersResource) { it is Resource.Loading }
-
-    /**
-     * Флаг ошибки загрузки ресурса
-     */
-    val isError = Transformations.map(_postersResource) { it is Resource.Error }
-
-    /**
-     * Флаг успешности загрузки ресурса
-     */
-    val isSuccess = Transformations.map(_postersResource) { it is Resource.Success }
-
-    /**
-     * Событие перехода на экран с подробной информацией о постере
-     */
-    private val _navigateToPoster = MutableLiveData<Event<Image>>()
-    val navigateToPoster: LiveData<Event<Image>>
-        get() = _navigateToPoster
+    private val _postersResource = MutableStateFlow<Resource<List<Image>>?>(null)
+    val postersResource = _postersResource.asStateFlow()
 
     init {
         getPosters()
@@ -70,28 +50,18 @@ class PostersViewModel @AssistedInject constructor(
      */
     fun reload() = getPosters()
 
-    /**
-     * Метод для обработки выбора постера
-     *
-     * @param image выбранный постер
-     */
-    fun selectPoster(image: Image) {
-        _navigateToPoster.value = Event(image)
-    }
-
     private fun getPosters() {
-        _postersResource.value = Resource.Loading()
-
         viewModelScope.launch {
+            _postersResource.update { Resource.Loading() }
             try {
                 val result = when (cinematicType) {
                     CinematicType.MOVIE -> moviesRepository.getMovieImages(cinematicId)
                     CinematicType.TV -> tvRepository.getTvImages(cinematicId)
                 }
-                _postersResource.value = Resource.Success(result.posters)
+                _postersResource.update { Resource.Success(result.posters) }
             } catch (e: Exception) {
                 // TODO обрабатывать соответствующие исключения
-                _postersResource.value = Resource.Error("Error: ${e.message}")
+                _postersResource.update { Resource.Error("Error: ${e.message}") }
                 Log.e(TAG, "getPosters: ${e.message}")
             }
         }

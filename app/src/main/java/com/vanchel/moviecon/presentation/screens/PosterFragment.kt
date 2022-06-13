@@ -20,7 +20,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -32,10 +31,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.vanchel.moviecon.R
 import com.vanchel.moviecon.data.network.IMAGES_URL
 import com.vanchel.moviecon.databinding.FragmentPosterBinding
-import com.vanchel.moviecon.presentation.viewmodels.PosterViewModel
 import com.vanchel.moviecon.util.SIZE_ORIGINAL
 import com.vanchel.moviecon.util.generatePictureFileName
-import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.io.FileOutputStream
 
@@ -44,15 +41,12 @@ import java.io.FileOutputStream
  *
  * Фрагмент, отображающий один постер.
  */
-@AndroidEntryPoint
 class PosterFragment : Fragment() {
     private var _binding: FragmentPosterBinding? = null
     private val binding: FragmentPosterBinding
         get() = _binding!!
 
     private val args: PosterFragmentArgs by navArgs()
-
-    private val posterViewModel: PosterViewModel by viewModels()
 
     private val imageLoadListener = object : RequestListener<Drawable> {
         override fun onLoadFailed(
@@ -65,7 +59,7 @@ class PosterFragment : Fragment() {
             resource: Drawable?, model: Any?, target: Target<Drawable>?,
             dataSource: DataSource?, isFirstResource: Boolean
         ): Boolean {
-            posterViewModel.imageLoadSuccess()
+            binding.toolbar.menu.findItem(R.id.menu_item_save_to_gallery).isEnabled = true
             return false
         }
     }
@@ -85,8 +79,6 @@ class PosterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setUpToolbar()
-        setViewModelObservers()
-
         Glide.with(view)
             .load("$IMAGES_URL$SIZE_ORIGINAL${args.imagePath}")
             .listener(imageLoadListener)
@@ -108,28 +100,11 @@ class PosterFragment : Fragment() {
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.menu_item_save_to_gallery -> {
-                        posterViewModel.saveToGallery()
+                        saveImage()
                         true
                     }
                     else -> false
                 }
-            }
-        }
-    }
-
-    private fun setViewModelObservers() {
-        posterViewModel.apply {
-            saveToGallery.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { saveImage() }
-            }
-            savedToGallery.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let {
-                    Snackbar.make(binding.root, R.string.saved_to_gallery, Snackbar.LENGTH_SHORT)
-                        .show()
-                }
-            }
-            isImageAvailable.observe(viewLifecycleOwner) {
-                binding.toolbar.menu.findItem(R.id.menu_item_save_to_gallery).isEnabled = it
             }
         }
     }
@@ -176,28 +151,27 @@ class PosterFragment : Fragment() {
             requireActivity().sendBroadcast(intent)
         }
 
-        posterViewModel.imageSaveSuccess()
+        Snackbar.make(binding.root, R.string.saved_to_gallery, Snackbar.LENGTH_SHORT)
+            .show()
     }
 
-    private fun requestStoragePermission(): Boolean {
-        when {
-            ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                return true
-            }
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                requireActivity(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) -> {
-                showRationale()
-                return false
-            }
-            else -> {
-                requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                return false
-            }
+    private fun requestStoragePermission() = when {
+        ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED -> {
+            true
+        }
+        ActivityCompat.shouldShowRequestPermissionRationale(
+            requireActivity(),
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) -> {
+            showRationale()
+            false
+        }
+        else -> {
+            requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            false
         }
     }
 

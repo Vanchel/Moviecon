@@ -2,7 +2,6 @@ package com.vanchel.moviecon.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.vanchel.moviecon.domain.entities.TvType
@@ -30,7 +29,6 @@ class TvsViewModel @AssistedInject constructor(
      */
     val tvs = repository.getTvsStream(type)
         .cachedIn(viewModelScope)
-        .asLiveData()
 
     companion object {
         /**

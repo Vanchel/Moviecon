@@ -1,70 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".presentation.screens.FilmographyFragment">
 
-    <data>
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/Widget.App.Toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="@string/filmography"
+        tools:subtitle="Gérard Depardieu" />
 
-        <variable
-                name="viewModel"
-                type="com.vanchel.moviecon.presentation.viewmodels.FilmographyViewModel" />
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-        <import type="android.view.View" />
-    </data>
+        <include
+            android:id="@+id/section_loading"
+            layout="@layout/layout_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/margin_regular"
+            tools:visibility="gone" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+        <include
+            android:id="@+id/section_error"
+            layout="@layout/layout_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/margin_regular"
+            tools:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".presentation.screens.FilmographyFragment">
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/list_item_list_credits" />
 
-        <androidx.appcompat.widget.Toolbar
-                style="@style/Widget.App.Toolbar"
-                android:id="@+id/toolbar"
-                android:layout_width="0dp"
-                android:layout_height="?attr/actionBarSize"
-                app:title="@string/filmography"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:subtitle="Gérard Depardieu" />
-
-        <FrameLayout
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toolbar"
-                app:layout_constraintBottom_toBottomOf="parent">
-
-            <include
-                    android:id="@+id/section_loading"
-                    layout="@layout/layout_loading"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:layout_margin="@dimen/margin_regular"
-                    android:layout_gravity="center"
-                    android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}"
-                    tools:visibility="gone" />
-
-            <include
-                    android:id="@+id/section_error"
-                    layout="@layout/layout_error"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:layout_margin="@dimen/margin_regular"
-                    android:layout_gravity="center"
-                    android:visibility="@{viewModel.isError ? View.VISIBLE : View.GONE}"
-                    tools:visibility="gone" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="@{viewModel.isSuccess ? View.VISIBLE : View.GONE}"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/list_item_list_credits" />
-
-        </FrameLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

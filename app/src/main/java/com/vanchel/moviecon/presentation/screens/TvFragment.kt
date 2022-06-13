@@ -4,8 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -21,6 +25,7 @@ import com.vanchel.moviecon.presentation.utils.navigate
 import com.vanchel.moviecon.presentation.viewmodels.TvViewModel
 import com.vanchel.moviecon.util.SIZE_BACKDROP_LARGE
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -50,12 +55,6 @@ class TvFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTvBinding.inflate(inflater, container, false)
-
-        binding.apply {
-            lifecycleOwner = viewLifecycleOwner
-            viewModel = tvViewModel
-        }
-
         return binding.root
     }
 
@@ -82,35 +81,17 @@ class TvFragment : Fragment() {
     }
 
     private fun setViewModelObservers() {
-        tvViewModel.apply {
-            tvDetailsResource.observe(viewLifecycleOwner) { res ->
-                when (res) {
-                    is Resource.Success -> res.data?.let(::bindTvDetailsData)
-                    else -> Unit
-                }
-            }
-            navigateToPersonDetails.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { actor ->
-                    navigate(TvFragmentDirections.tvToPerson(actor.id, actor.name))
-                }
-            }
-            navigateToCast.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let {
-                    navigate(
-                        TvFragmentDirections.tvToCast(args.tvId, CinematicType.TV, args.tvName)
-                    )
-                }
-            }
-            navigateToPosters.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let {
-                    navigate(
-                        TvFragmentDirections.tvToPosters(args.tvId, CinematicType.TV, args.tvName)
-                    )
-                }
-            }
-            navigateToPlayer.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { videoId ->
-                    navigate(TvFragmentDirections.tvToPlayer(videoId))
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                tvViewModel.tvDetailsResource.collect { resource ->
+                    if (resource is Resource.Success) {
+                        resource.data?.let(::bindTvDetailsData)
+                    }
+                    binding.run {
+                        sectionContent.isVisible = resource is Resource.Success
+                        sectionLoading.root.isVisible = resource is Resource.Loading
+                        sectionError.root.isVisible = resource is Resource.Error
+                    }
                 }
             }
         }
@@ -118,9 +99,24 @@ class TvFragment : Fragment() {
 
     private fun setOnClickListeners() {
         binding.apply {
-            textCast.setOnClickListener { tvViewModel.viewFullCast() }
-            textPosters.setOnClickListener { tvViewModel.viewMoviePosters() }
-            fabTrailer.setOnClickListener { tvViewModel.viewTrailer() }
+            textCast.setOnClickListener {
+                navigate(
+                    TvFragmentDirections.tvToCast(
+                        cinematicId = args.tvId,
+                        type = CinematicType.TV,
+                        cinematicName = args.tvName
+                    )
+                )
+            }
+            textPosters.setOnClickListener {
+                navigate(
+                    TvFragmentDirections.tvToPosters(
+                        cinematicId = args.tvId,
+                        type = CinematicType.TV,
+                        cinematicName = args.tvName
+                    )
+                )
+            }
             sectionError.buttonRetry.setOnClickListener { tvViewModel.reload() }
         }
     }
@@ -128,7 +124,7 @@ class TvFragment : Fragment() {
     private fun setUpCastRecyclerView() {
         binding.recyclerViewCast.adapter = CastPanelAdapter(object : CastPanelAdapter.ItemCallback {
             override fun onItemSelected(item: Cast) {
-                tvViewModel.selectCastPerson(item)
+                navigate(TvFragmentDirections.tvToPerson(item.id, item.name))
             }
         })
     }
@@ -140,10 +136,13 @@ class TvFragment : Fragment() {
                 Glide.with(requireView())
                     .load(url).placeholder(R.drawable.img_backdrop).into(backdrop)
             }
-            fabTrailer.visibility = if (tvDetails.officialTrailer != null) {
-                View.VISIBLE
-            } else {
-                View.GONE
+            fabTrailer.run {
+                isVisible = tvDetails.officialTrailer != null
+                tvDetails.officialTrailer?.key?.let { videoKey ->
+                    setOnClickListener {
+                        navigate(TvFragmentDirections.tvToPlayer(videoKey))
+                    }
+                }
             }
             textGenres.text = tvDetails.genreNames.joinToString()
             textEpisodeDuration.text = tvDetails.episodeRunTime.average().toInt().let {

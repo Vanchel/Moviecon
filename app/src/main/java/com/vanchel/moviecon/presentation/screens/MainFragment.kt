@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavDirections
 import androidx.paging.LoadState
 import com.vanchel.moviecon.R
@@ -21,6 +24,8 @@ import com.vanchel.moviecon.presentation.adapters.TvsTrendingAdapter
 import com.vanchel.moviecon.presentation.utils.navigate
 import com.vanchel.moviecon.presentation.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 /**
  * @author Иван Тимашов
@@ -38,7 +43,7 @@ class MainFragment : Fragment() {
     private val moviesAdapter by lazy {
         MoviesTrendingAdapter(object : MoviesTrendingAdapter.ItemCallback {
             override fun onItemSelected(item: Movie) {
-                mainViewModel.viewMovie(item)
+                navigate(MainFragmentDirections.mainToMovie(item.id, item.title))
             }
         })
     }
@@ -46,7 +51,7 @@ class MainFragment : Fragment() {
     private val tvsAdapter by lazy {
         TvsTrendingAdapter(object : TvsTrendingAdapter.ItemCallback {
             override fun onItemSelected(item: Tv) {
-                mainViewModel.viewTv(item)
+                navigate(MainFragmentDirections.mainToTv(item.id, item.name))
             }
         })
     }
@@ -54,7 +59,7 @@ class MainFragment : Fragment() {
     private val peopleAdapter by lazy {
         PeopleTrendingAdapter(object : PeopleTrendingAdapter.ItemCallback {
             override fun onItemSelected(item: Person) {
-                mainViewModel.viewPerson(item)
+                navigate(MainFragmentDirections.mainToPerson(item.id, item.name))
             }
         })
     }
@@ -124,30 +129,17 @@ class MainFragment : Fragment() {
     }
 
     private fun setViewModelObservers() {
-        mainViewModel.apply {
-            navigateToMovie.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { movie ->
-                    navigate(MainFragmentDirections.mainToMovie(movie.id, movie.title))
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    mainViewModel.movies.collectLatest(moviesAdapter::submitData)
                 }
-            }
-            navigateToTv.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { tv ->
-                    navigate(MainFragmentDirections.mainToTv(tv.id, tv.name))
+                launch {
+                    mainViewModel.tvs.collectLatest(tvsAdapter::submitData)
                 }
-            }
-            navigateToPerson.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { person ->
-                    navigate(MainFragmentDirections.mainToPerson(person.id, person.name))
+                launch {
+                    mainViewModel.people.collectLatest(peopleAdapter::submitData)
                 }
-            }
-            movies.observe(viewLifecycleOwner) { pagingData ->
-                moviesAdapter.submitData(lifecycle, pagingData)
-            }
-            tvs.observe(viewLifecycleOwner) { pagingData ->
-                tvsAdapter.submitData(lifecycle, pagingData)
-            }
-            people.observe(viewLifecycleOwner) { pagingData ->
-                peopleAdapter.submitData(lifecycle, pagingData)
             }
         }
     }

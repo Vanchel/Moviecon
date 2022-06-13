@@ -1,16 +1,20 @@
 package com.vanchel.moviecon.presentation.viewmodels
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.vanchel.moviecon.domain.entities.Cast
 import com.vanchel.moviecon.domain.entities.CinematicType
 import com.vanchel.moviecon.domain.repositories.MoviesRepository
 import com.vanchel.moviecon.domain.repositories.TvRepository
-import com.vanchel.moviecon.presentation.utils.Event
 import com.vanchel.moviecon.presentation.utils.Resource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val TAG = "CastViewModel"
@@ -35,31 +39,8 @@ class CastViewModel @AssistedInject constructor(
     /**
      * [Resource], содержащий состояние списка актеров
      */
-    private val _castResource = MutableLiveData<Resource<List<Cast>>>()
-    val castResource: LiveData<Resource<List<Cast>>>
-        get() = _castResource
-
-    /**
-     * Флаг загрузки ресурса
-     */
-    val isLoading = Transformations.map(_castResource) { it is Resource.Loading }
-
-    /**
-     * Флаг ошибки загрузки ресурса
-     */
-    val isError = Transformations.map(_castResource) { it is Resource.Error }
-
-    /**
-     * Флаг успешности загрузки ресурса
-     */
-    val isSuccess = Transformations.map(_castResource) { it is Resource.Success }
-
-    /**
-     * Событие перехода на экран с подробной информацией об актере
-     */
-    private val _navigateToPersonDetails = MutableLiveData<Event<Cast>>()
-    val navigateToPersonDetails: LiveData<Event<Cast>>
-        get() = _navigateToPersonDetails
+    private val _castResource = MutableStateFlow<Resource<List<Cast>>?>(null)
+    val castResource = _castResource.asStateFlow()
 
     init {
         getCinematicCast()
@@ -70,28 +51,19 @@ class CastViewModel @AssistedInject constructor(
      */
     fun reload() = getCinematicCast()
 
-    /**
-     * Метод для обработки выбора актера
-     *
-     * @param actor выбранный актер
-     */
-    fun selectCastPerson(actor: Cast) {
-        _navigateToPersonDetails.value = Event(actor)
-    }
-
     private fun getCinematicCast() {
-        _castResource.value = Resource.Loading()
         viewModelScope.launch {
             try {
+                _castResource.update { Resource.Loading() }
                 val result = when (cinematicType) {
                     CinematicType.MOVIE -> moviesRepository.getMovieCredits(cinematicId)
                     CinematicType.TV -> tvRepository.getTvCredits(cinematicId)
                 }
-                _castResource.value = Resource.Success(result)
+                _castResource.update { Resource.Success(result) }
 
             } catch (e: Exception) {
                 // TODO обрабатывать соответствующие исключения
-                _castResource.value = Resource.Error("Error: ${e.message}")
+                _castResource.update { Resource.Error("Error: ${e.message}") }
                 Log.e(TAG, "getCinematicCast: ${e.message}")
             }
         }

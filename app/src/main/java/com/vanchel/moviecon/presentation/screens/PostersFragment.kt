@@ -4,8 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.vanchel.moviecon.R
@@ -16,6 +20,7 @@ import com.vanchel.moviecon.presentation.utils.Resource
 import com.vanchel.moviecon.presentation.utils.navigate
 import com.vanchel.moviecon.presentation.viewmodels.PostersViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -45,12 +50,6 @@ class PostersFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPostersBinding.inflate(inflater, container, false)
-
-        binding.apply {
-            lifecycleOwner = viewLifecycleOwner
-            viewModel = postersViewModel
-        }
-
         return binding.root
     }
 
@@ -83,22 +82,23 @@ class PostersFragment : Fragment() {
     private fun setUpRecyclerView() {
         binding.recyclerView.adapter = PostersListAdapter(object : PostersListAdapter.ItemCallback {
             override fun onItemSelected(item: Image) {
-                postersViewModel.selectPoster(item)
+                navigate(PostersFragmentDirections.postersToPoster(item.filePath))
             }
         })
     }
 
     private fun setViewModelObservers() {
-        postersViewModel.apply {
-            postersResource.observe(viewLifecycleOwner) { res ->
-                when(res) {
-                    is Resource.Success -> res.data?.let(::bindPostersData)
-                    else -> Unit
-                }
-            }
-            navigateToPoster.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { image ->
-                    navigate(PostersFragmentDirections.postersToPoster(image.filePath))
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                postersViewModel.postersResource.collect { resource ->
+                    if (resource is Resource.Success) {
+                        resource.data?.let(::bindPostersData)
+                    }
+                    binding.run {
+                        recyclerView.isVisible = resource is Resource.Success
+                        sectionLoading.root.isVisible = resource is Resource.Loading
+                        sectionError.root.isVisible = resource is Resource.Error
+                    }
                 }
             }
         }

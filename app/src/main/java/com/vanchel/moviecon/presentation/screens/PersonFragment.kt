@@ -7,8 +7,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -24,6 +28,7 @@ import com.vanchel.moviecon.presentation.viewmodels.PersonViewModel
 import com.vanchel.moviecon.util.SIZE_PROFILE_LARGE
 import com.vanchel.moviecon.util.extensions.title
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 import org.joda.time.Period
 import java.text.SimpleDateFormat
@@ -57,12 +62,6 @@ class PersonFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPersonBinding.inflate(inflater, container, false)
-
-        binding.apply {
-            lifecycleOwner = viewLifecycleOwner
-            viewModel = personViewModel
-        }
-
         return binding.root
     }
 
@@ -89,36 +88,45 @@ class PersonFragment : Fragment() {
     }
 
     private fun setViewModelObservers() {
-        personViewModel.apply {
-            personDetailsResource.observe(viewLifecycleOwner) { res ->
-                when (res) {
-                    is Resource.Success -> res.data?.let(::bindPersonDetailsData)
-                    else -> Unit
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    personViewModel.personDetailsResource.collect { resource ->
+                        if (resource is Resource.Success) {
+                            resource.data?.let(::bindPersonDetailsData)
+                        }
+                        binding.run {
+                            sectionContent.isVisible = resource is Resource.Success
+                            sectionLoading.root.isVisible = resource is Resource.Loading
+                            sectionError.root.isVisible = resource is Resource.Error
+                        }
+                    }
                 }
-            }
-            navigateToMovie.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { credit ->
-                    navigate(PersonFragmentDirections.personToMovie(credit.id, credit.title))
+                launch {
+                    personViewModel.selectedMovie.collect { movie ->
+                        movie?.let {
+                            navigate(
+                                PersonFragmentDirections.personToMovie(
+                                    movieId = movie.id,
+                                    movieName = movie.title
+                                )
+                            )
+                            personViewModel.selectedMovieProcessed()
+                        }
+                    }
                 }
-            }
-            navigateToTv.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { credit ->
-                    navigate(PersonFragmentDirections.personToTv(credit.id, credit.title))
-                }
-            }
-            navigateToInstagram.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let { instagramId ->
-                    openInstagramProfile(instagramId)
-                }
-            }
-            navigateToFilmography.observe(viewLifecycleOwner) {
-                it.getContentIfNotHandled()?.let {
-                    navigate(
-                        PersonFragmentDirections.personToFilmography(
-                            args.personId,
-                            args.personName
-                        )
-                    )
+                launch {
+                    personViewModel.selectedTv.collect { tv ->
+                        tv?.let {
+                            navigate(
+                                PersonFragmentDirections.personToTv(
+                                    tvId = tv.id,
+                                    tvName = tv.title
+                                )
+                            )
+                            personViewModel.selectedTvProcessed()
+                        }
+                    }
                 }
             }
         }
@@ -126,8 +134,14 @@ class PersonFragment : Fragment() {
 
     private fun setOnClickListeners() {
         binding.apply {
-            textFilmography.setOnClickListener { personViewModel.viewFilmography() }
-            fabInstagram.setOnClickListener { personViewModel.viewInstagramProfile() }
+            textFilmography.setOnClickListener {
+                navigate(
+                    PersonFragmentDirections.personToFilmography(
+                        personId = args.personId,
+                        personName = args.personName
+                    )
+                )
+            }
             sectionError.buttonRetry.setOnClickListener { personViewModel.reload() }
         }
     }
@@ -148,10 +162,9 @@ class PersonFragment : Fragment() {
                 Glide.with(requireView())
                     .load(url).placeholder(R.drawable.ic_round_person_24).into(avatar)
             }
-            fabInstagram.visibility = if (personDetails.instagramId != null) {
-                View.VISIBLE
-            } else {
-                View.GONE
+            fabInstagram.run {
+                isVisible = personDetails.instagramId != null
+                personDetails.instagramId?.let(::openInstagramProfile)
             }
             textBirthday.text = formatBirthDay(personDetails.birthday, personDetails.deathDay)
             textPlaceOfBirth.text = personDetails.placeOfBirth

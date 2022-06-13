@@ -1,16 +1,20 @@
 package com.vanchel.moviecon.presentation.viewmodels
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.vanchel.moviecon.domain.entities.CinematicType
 import com.vanchel.moviecon.domain.entities.Credit
 import com.vanchel.moviecon.domain.entities.PersonDetails
 import com.vanchel.moviecon.domain.repositories.PeopleRepository
-import com.vanchel.moviecon.presentation.utils.Event
 import com.vanchel.moviecon.presentation.utils.Resource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val TAG = "PersonViewModel"
@@ -31,56 +35,24 @@ class PersonViewModel @AssistedInject constructor(
     /**
      * [Resource], содержащий состояние данных о конкретном человеке.
      */
-    private val _personDetailsResource = MutableLiveData<Resource<PersonDetails>>()
-    val personDetailsResource: LiveData<Resource<PersonDetails>>
-        get() = _personDetailsResource
-
-    /**
-     * Флаг загрузки ресурса
-     */
-    val isLoading = Transformations.map(_personDetailsResource) { it is Resource.Loading }
-
-    /**
-     * Флаг ошибки загрузки ресурса
-     */
-    val isError = Transformations.map(_personDetailsResource) { it is Resource.Error }
-
-    /**
-     * Флаг успешности загрузки ресурса
-     */
-    val isSuccess = Transformations.map(_personDetailsResource) { it is Resource.Success }
-
-    /**
-     * Событие перехода на экран с подробной информацией о фильме
-     */
-    private val _navigateToMovie = MutableLiveData<Event<Credit>>()
-    val navigateToMovie: LiveData<Event<Credit>>
-        get() = _navigateToMovie
-
-    /**
-     * Событие перехода на экран с подробной информацией о сериале
-     */
-    private val _navigateToTv = MutableLiveData<Event<Credit>>()
-    val navigateToTv: LiveData<Event<Credit>>
-        get() = _navigateToTv
-
-    /**
-     * Событие перехода в instagram человека
-     */
-    private val _navigateToInstagram = MutableLiveData<Event<String>>()
-    val navigateToInstagram: LiveData<Event<String>>
-        get() = _navigateToInstagram
-
-    /**
-     * Событие перехода к фильмографии человека
-     */
-    private val _navigateToFilmography = MutableLiveData<Event<Unit>>()
-    val navigateToFilmography: LiveData<Event<Unit>>
-        get() = _navigateToFilmography
+    private val _personDetailsResource = MutableStateFlow<Resource<PersonDetails>?>(null)
+    val personDetailsResource = _personDetailsResource.asStateFlow()
 
     init {
         getPersonDetails()
     }
+
+    /**
+     * Выбранный фильм
+     */
+    private val _selectedMovie = MutableStateFlow<Credit?>(null)
+    val selectedMovie = _selectedMovie.asStateFlow()
+
+    /**
+     * Выбранный сериал
+     */
+    private val _selectedTv = MutableStateFlow<Credit?>(null)
+    val selectedTv = _selectedTv.asStateFlow()
 
     /**
      * Метод для повторной загрузки данных
@@ -94,37 +66,34 @@ class PersonViewModel @AssistedInject constructor(
      */
     fun viewCredit(credit: Credit) {
         when (credit.type) {
-            CinematicType.MOVIE -> _navigateToMovie.value = Event(credit)
-            CinematicType.TV -> _navigateToTv.value = Event(credit)
+            CinematicType.MOVIE -> _selectedMovie.update { credit }
+            CinematicType.TV -> _selectedTv.update { credit }
         }
     }
 
     /**
-     * Метод для обработки выбора профиля instagram
+     * Метод для сброса выбранного фильма
      */
-    fun viewInstagramProfile() {
-        val res = _personDetailsResource.value
-        if (res is Resource.Success) {
-            res.data?.instagramId?.let { _navigateToInstagram.value = Event(it) }
-        }
+    fun selectedMovieProcessed() {
+        _selectedMovie.update { null }
     }
 
     /**
-     * Метод для обработки выбора фильмографии человека
+     * Метод для сброса выбранного сериала
      */
-    fun viewFilmography() {
-        _navigateToFilmography.value = Event(Unit)
+    fun selectedTvProcessed() {
+        _selectedTv.update { null }
     }
 
     private fun getPersonDetails() {
-        _personDetailsResource.value = Resource.Loading()
         viewModelScope.launch {
+            _personDetailsResource.update { Resource.Loading() }
             try {
                 val result = peopleRepository.getPersonDetails(personId)
-                _personDetailsResource.value = Resource.Success(result)
+                _personDetailsResource.update { Resource.Success(result) }
             } catch (e: Exception) {
                 // TODO обрабатывать соответствующие исключения
-                _personDetailsResource.value = Resource.Error("Error: ${e.message}")
+                _personDetailsResource.update { Resource.Error("Error: ${e.message}") }
                 Log.e(TAG, "getPersonDetails")
                 e.printStackTrace()
             }

@@ -1,15 +1,18 @@
 package com.vanchel.moviecon.presentation.viewmodels
 
 import android.util.Log
-import androidx.lifecycle.*
-import com.vanchel.moviecon.domain.entities.Cast
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.vanchel.moviecon.domain.entities.MovieDetails
 import com.vanchel.moviecon.domain.repositories.MoviesRepository
-import com.vanchel.moviecon.presentation.utils.Event
 import com.vanchel.moviecon.presentation.utils.Resource
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val TAG = "MovieViewModel"
@@ -30,52 +33,8 @@ class MovieViewModel @AssistedInject constructor(
     /**
      * [Resource], содержащий состояние данных о конкретном фильме.
      */
-    private val _movieDetailsResource = MutableLiveData<Resource<MovieDetails>>()
-    val movieDetailsResource: LiveData<Resource<MovieDetails>>
-        get() = _movieDetailsResource
-
-    /**
-     * Флаг загрузки ресурса
-     */
-    val isLoading = Transformations.map(_movieDetailsResource) { it is Resource.Loading }
-
-    /**
-     * Флаг ошибки загрузки ресурса
-     */
-    val isError = Transformations.map(_movieDetailsResource) { it is Resource.Error }
-
-    /**
-     * Флаг успешности загрузки ресурса
-     */
-    val isSuccess = Transformations.map(_movieDetailsResource) { it is Resource.Success }
-
-    /**
-     * Событие перехода на экран с подробной информацией о человеке
-     */
-    private val _navigateToPersonDetails = MutableLiveData<Event<Cast>>()
-    val navigateToPersonDetails: LiveData<Event<Cast>>
-        get() = _navigateToPersonDetails
-
-    /**
-     * Событие перехода на экран с полным актерским составом
-     */
-    private val _navigateToCast = MutableLiveData<Event<Unit>>()
-    val navigateToCast: LiveData<Event<Unit>>
-        get() = _navigateToCast
-
-    /**
-     * Событие перехода на экран с постерами фильма
-     */
-    private val _navigateToPosters = MutableLiveData<Event<Unit>>()
-    val navigateToPosters: LiveData<Event<Unit>>
-        get() = _navigateToPosters
-
-    /**
-     * Событие перехода на экран просмотра трейлера к фильму
-     */
-    private val _navigateToPlayer = MutableLiveData<Event<String>>()
-    val navigateToPlayer: LiveData<Event<String>>
-        get() = _navigateToPlayer
+    private val _movieDetailsResource = MutableStateFlow<Resource<MovieDetails>?>(null)
+    val movieDetailsResource = _movieDetailsResource.asStateFlow()
 
     init {
         getMovieDetails()
@@ -86,48 +45,15 @@ class MovieViewModel @AssistedInject constructor(
      */
     fun reload() = getMovieDetails()
 
-    /**
-     * Метод для обработки выбора актера, снимавшегося в фильме
-     *
-     * @param actor выбранный актер
-     */
-    fun selectCastPerson(actor: Cast) {
-        _navigateToPersonDetails.value = Event(actor)
-    }
-
-    /**
-     * Метод для обработки выбора актерского состава фильма
-     */
-    fun viewFullCast() {
-        _navigateToCast.value = Event(Unit)
-    }
-
-    /**
-     * Метод для обработки выбора постеров фильма
-     */
-    fun viewMoviePosters() {
-        _navigateToPosters.value = Event(Unit)
-    }
-
-    /**
-     * Метод для обработки выбора трейлера фильма
-     */
-    fun viewTrailer() {
-        val res = _movieDetailsResource.value
-        if (res is Resource.Success) {
-            res.data?.officialTrailer?.key?.let { _navigateToPlayer.value = Event(it) }
-        }
-    }
-
     private fun getMovieDetails() {
-        _movieDetailsResource.value = Resource.Loading()
         viewModelScope.launch {
+            _movieDetailsResource.update { Resource.Loading() }
             try {
                 val result = moviesRepository.getMovieDetails(movieId)
-                _movieDetailsResource.value = Resource.Success(result)
+                _movieDetailsResource.update { Resource.Success(result) }
             } catch (e: Exception) {
                 // TODO обрабатывать соответствующие исключения
-                _movieDetailsResource.value = Resource.Error("Error: ${e.message}")
+                _movieDetailsResource.update { Resource.Error("Error: ${e.message}") }
                 Log.e(TAG, "getMovieDetails: ${e.message}")
             }
         }
